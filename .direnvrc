@@ -1,0 +1,120 @@
+use_brew() {
+  export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+  export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+  export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
+  export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin${PATH+:$PATH}"
+  export MANPATH="/home/linuxbrew/.linuxbrew/share/man${MANPATH+:$MANPATH}:"
+  export INFOPATH="/home/linuxbrew/.linuxbrew/share/info${INFOPATH+:$INFOPATH}"
+}
+
+use_pyenv() {
+  export PATH="$HOME/.pyenv/bin:$PATH"
+  eval "$(pyenv init -)"
+}
+
+use_goenv() {
+  export PATH="$HOME/.goenv/bin:$PATH"
+  eval "$(goenv init -)"
+}
+
+use_nodenv() {
+  export PATH="$HOME/.nodenv/bin:$PATH"
+  eval "$(nodenv init -)"
+  [[ ":$PATH:" != *":./node_modules/.bin:"* ]] && export PATH="./node_modules/.bin:$PATH"
+}
+
+use_jenv() {
+  export PATH="$HOME/.jenv/bin:$PATH"
+  eval "$(jenv init -)"
+}
+
+use_serverless() {
+  use_nodenv
+  # tabtab source for packages
+  # uninstall by removing these lines
+  [ -f ~/.config/tabtab/__tabtab.bash ] && . ~/.config/tabtab/__tabtab.bash || true
+}
+
+layout_pyenv() {
+  unset PYENV_VERSION
+  # Because each python version is prepended to the PATH, add them in reverse order
+  for ((j = $#; j >= 1; j--)); do
+    local python_version=${!j}
+    local pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
+    if [[ ! -x "$pyenv_python" ]]; then
+      log_error "Error: $pyenv_python can't be executed."
+      return 1
+    fi
+
+    unset PYTHONHOME
+    local ve=$($pyenv_python -c "import pkgutil; print('venv' if pkgutil.find_loader('venv') else ('virtualenv' if pkgutil.find_loader('virtualenv') else ''))")
+
+    case $ve in
+      "venv")
+        VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+        export VIRTUAL_ENV
+        if [[ ! -d $VIRTUAL_ENV ]]; then
+          $pyenv_python -m venv "$VIRTUAL_ENV"
+        fi
+        PATH_add "$VIRTUAL_ENV"/bin
+        ;;
+      "virtualenv")
+        layout_python "$pyenv_python"
+        ;;
+      *)
+        log_error "Error: neither venv nor virtualenv are available to ${pyenv_python}."
+        return 1
+        ;;
+    esac
+
+    # e.g. Given "use pyenv 3.6.9 2.7.16", PYENV_VERSION becomes "3.6.9:2.7.16"
+    [[ -z "${PYENV_VERSION-}" ]] && PYENV_VERSION=$python_version || PYENV_VERSION="${python_version}:$PYENV_VERSION"
+  done
+
+  export PYENV_VERSION
+}
+
+# Example: export_alias zz "ls -la"
+export_alias() {
+  local name=$1
+  shift
+  local alias_dir=$PWD/.direnv/aliases
+  local target="$alias_dir/$name"
+  mkdir -p "$alias_dir"
+  PATH_add "$alias_dir"
+  echo "#!/usr/bin/env bash -e" > "$target"
+  echo "$@" >> "$target"
+  chmod +x "$target"
+}
+
+export_function() {
+  local name=$1
+  local alias_dir=$PWD/.direnv/aliases
+  mkdir -p "$alias_dir"
+  PATH_add "$alias_dir"
+  local target="$alias_dir/$name"
+  if declare -f "$name" >/dev/null; then
+    echo "#!$SHELL" > "$target"
+    declare -f "$name" >> "$target" 2>/dev/null
+    # Notice that we add shell variables to the function trigger.
+    echo "$name \$*" >> "$target"
+    chmod +x "$target"
+  fi
+}
+
+layout_poetry() {
+  if [[ ! -f pyproject.toml ]]; then
+    log_error 'No pyproject.toml found.  Use `poetry new` or `poetry init` to create one first.'
+    exit 2
+  fi
+
+  local VENV=$(poetry env list --full-path | cut -d' ' -f1)
+  if [[ -z $VENV || ! -d $VENV/bin ]]; then
+    log_error 'No created poetry virtual environment found.  Use `poetry install` to create one first.'
+    exit 2
+  fi
+  VENV=$VENV/bin
+  export VIRTUAL_ENV=$(echo "$VENV" | rev | cut -d'/' -f2- | rev)
+  export POETRY_ACTIVE=1
+  PATH_add "$VENV"
+}

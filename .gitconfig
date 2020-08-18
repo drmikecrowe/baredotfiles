@@ -1,0 +1,45 @@
+[includeIf "gitdir:~/Programming/Personal/"]
+    path = ~/Programming/Programming/.gitconfig
+
+[includeIf "gitdir:~/Programming/Home/"]
+    path = ~/Programming/Home/.gitconfig
+
+[includeIf "gitdir:~/Programming/MikKelTech/"]
+    path = ~/Programming/MikKelTech/.gitconfig
+
+[includeIf "gitdir:~/Programming/Pinnacle/"]
+    path = ~/Programming/Pinnacle/.gitconfig
+
+[includeIf "gitdir:~/"]
+    path = ~/Programming/Personal/.gitconfig
+
+[includeIf "gitdir:~/.yadm/"]
+    path = ~/Programming/Personal/.gitconfig
+
+[url "git@github.com:"]
+    insteadof = github:
+
+[include]
+    # https://github.com/dandavison/delta
+    path = ~/.g/delta.conf 
+    # My aliases
+    path = ~/.g/aliases.conf
+    # Use meld as my difftool
+    path = ~/.g/meld.conf
+
+[credential]
+	helper = store
+
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
+
+[push]
+	  default = current
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+  
