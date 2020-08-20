@@ -1,22 +1,33 @@
 #!/usr/bin/env bash
 
-DIR=$HOME/.bash 
+DIR=$HOME/.bash
 
-if [ $(uname) = "Linux" ]; then
-    source $DIR/linux-prompt.bash
-    for f in $DIR/linux/*; do 
-        source $f 
-    done 
-else
-    for f in $DIR/windows/*; do 
-        source $f 
-    done 
-fi
+case "$OSTYPE" in
+  solaris*) echo "SOLARIS" ;;
+  darwin*)
+    for f in $DIR/windows/*; do
+        source $f
+    done
+    ;;
+  linux*)
+    for f in $DIR/linux/*; do
+        source $f
+    done
+    ;;
+  bsd*)     echo "BSD" ;;
+  msys*)
+    for f in $DIR/windows/*; do
+        source $f
+    done
+    ;;
+  *)        echo "unknown: $OSTYPE" ;;
+esac
 
-for f in $DIR/common/*; do 
-  source $f 
-done 
 
-for f in $DIR/completions/*; do 
-  source $f 
-done 
+for f in $DIR/common/*; do
+  source $f
+done
+
+for f in $DIR/completions/*; do
+  source $f
+done
