@@ -15,7 +15,7 @@ find . -maxdepth 1 | while read FIL; do
         cp -R $FIL ~
     fi
 done
-rm -rf baredotfiles-master/
+rm baredotfiles* master.zip* -rf
 if [ "$(grep -o setup.bash ~/.bashrc)" == "setup.base" ]; then exit 0; fi
 cat <<EOF >>~.bashrc
 
