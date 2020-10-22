@@ -28,5 +28,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-
-export PATH="$HOME/.poetry/bin:$PATH"
+export NODENV_VERSION=10.22.0
+[[ ":$PATH:" != *":$HOME/.nodenv/bin:"* ]] && export PATH="$HOME/.nodenv/bin:$PATH"
+eval "$(nodenv init -)"
+[[ ":$PATH:" != *":./node_modules/.bin:"* ]] && export PATH="./node_modules/.bin:$PATH"

@@ -29,3 +29,5 @@ export GPG_TTY=$(tty);
 
 # Hide the “default interactive shell is now zsh” warning on macOS.
 export BASH_SILENCE_DEPRECATION_WARNING=1;
+
+export PATH="/usr/local/opt/openjdk/bin:$PATH"

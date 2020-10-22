@@ -18,3 +18,10 @@ alias la="ls -lAF ${colorflag}"
 
 # List only directories
 alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
+
+alias python="python3"
+
+function rm() {
+  echo >&2 'rm forbidden; use "/bin/rm"'
+}
+export -f rm

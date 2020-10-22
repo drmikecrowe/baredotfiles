@@ -4,24 +4,23 @@ import os
 from datetime import datetime
 from xonsh.history.json import JsonHistory
 
-$PL_PROMPT="cwd>rtns"
-$PL_TOOLBAR = 'who>branch>virtualenv>full_proc'
-
-# XONSH WIZARD START
-xontrib load apt_tabcomplete autojump docker_tabcomplete ssh_agent direnv coreutils powerline2
-# XONSH WIZARD END
-
-$XONSH_STORE_STDOUT = True
-#$XONSH_HISTORY_SIZE = 
-$XONSH_HISTORY_MATCH_ANYWHERE = True
-
-if os.path.exists("/usr/bin/ksshaskpass"):
-  ${...}["SSH_ASKPASS"] = '/usr/bin/ksshaskpass'
-
+if "/usr/local/bin" not in os.environ['PATH']:
+    $PATH.insert(0, "/usr/local/bin")
 home = ${...}["HOME"]
 for dir in ['.pyenv', '.nodenv', '.rbenv', '.goenv']:
   bin = "{}/{}/bin".format(home, dir)
   if os.path.exists(bin): $PATH.append(bin)
+
+$PL_PROMPT="cwd>rtns"
+$PL_TOOLBAR = 'who>branch>virtualenv>full_proc'
+
+# XONSH WIZARD START
+xontrib load ssh_agent direnv coreutils powerline2 # autojump #
+# XONSH WIZARD END
+
+$XONSH_STORE_STDOUT = True
+#$XONSH_HISTORY_SIZE =
+$XONSH_HISTORY_MATCH_ANYWHERE = True
 
 def csu(args, stdin=None):
   lines = []
@@ -42,8 +41,6 @@ aliases["dud"] = 'du -h --max-depth=1 --one-file-system'
 aliases["dudg"] = 'du -h --max-depth=1 --one-file-system 2>&1 | egrep "^[0-9.]*G"'
 aliases["gh"] = 'history | grep --colour=auto'
 aliases["grep"] = "grep --color --exclude-dir='.svn' --exclude-dir='.git'"
-aliases["l"] = 'ls -l --color=tty'
-aliases["ll"] = 'ls -la --color=tty'
 aliases["md"] = 'mkdir'
 aliases["psa"] = 'ps faux'
 aliases["psag"] = 'ps faux | grep'
@@ -52,6 +49,31 @@ aliases["ta"] = 'tmux attach -t'
 aliases["tnew"] = 'tmux new -s'
 aliases["tls"] = 'tmux ls'
 aliases["tkill"] = 'tmux kill-session -t'
+aliases['scp'] = '/usr/local/bin/scp'
+aliases['ssh'] = '/usr/local/bin/ssh'
+
+import platform
+plt = platform.system()
+
+colorflag = ""
+if plt == "Windows":
+    print("Your system is Windows")
+    # do x y z
+elif plt == "Linux":
+	colorflag="--color"
+	${...}["LS_COLORS"]='no=00:fi=00:di=01;31:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
+elif plt == "Darwin":
+	colorflag="-G"
+	${...}["LSCOLORS"]='BxBxhxDxfxhxhxhxhxcxcx'
+else:
+    print("Unidentified system")
+
+aliases["ls"] = f"ls {colorflag}"
+aliases["l"] = f"ls -lF {colorflag}"
+aliases["la"] = f"ls -lAF {colorflag}"
+aliases["lsd"] = f"ls -lF {colorflag} | grep --color=never '^d'"
+aliases["python"] = f"python3"
+
 
 class SaveAllHistory(JsonHistory):
   def append(self, cmd):
@@ -64,3 +86,5 @@ class SaveAllHistory(JsonHistory):
     except Exception:
       print("History not being saved")
 $XONSH_HISTORY_BACKEND = SaveAllHistory
+
+source-bash eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa

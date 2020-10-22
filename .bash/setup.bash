@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 DIR=$HOME/.bash
-
 case "$OSTYPE" in
   solaris*) echo "SOLARIS" ;;
   darwin*)
-    for f in $DIR/windows/*; do
+    for f in $DIR/macos/*; do
         source $f
     done
     ;;
@@ -22,7 +21,6 @@ case "$OSTYPE" in
     ;;
   *)        echo "unknown: $OSTYPE" ;;
 esac
-
 
 for f in $DIR/common/*; do
   source $f

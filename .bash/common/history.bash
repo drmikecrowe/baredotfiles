@@ -12,6 +12,9 @@ shopt -s cdspell
 shopt -s nocaseglob
 shopt -s histappend
 shopt -s cmdhist
+shopt -s histappend
+
+export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=10000
