@@ -8,3 +8,7 @@ export ZOPTS="-I"
 [[ ":$PATH:" != *":/$HOME/.goenv/bin:"* ]] && export PATH="$PATH:/$HOME/.goenv/bin"
 [[ ":$PATH:" != *":/$HOME/.local/bin:"* ]] && export PATH="$PATH:/$HOME/.local/bin"
 [[ ":$PATH:" != *":/snap/bin:"* ]] && export PATH="$PATH:/snap/bin"
+
+if [ -d ~/.dotbare ]; then
+    source ~/.dotbare/dotbare.plugin.bash
+fi

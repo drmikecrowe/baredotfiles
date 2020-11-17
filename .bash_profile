@@ -9,6 +9,7 @@ if [ -f ~/.agent.env ] ; then
     fi
 else
     echo "Starting ssh-agent"
-    eval `ssh-agent | tee ~/.agent.env`
+    eval `ssh-agent -s | tee ~/.agent.env`
     ssh-add
 fi
+[ -r ~/.bashrc ] && . ~/.bashrc

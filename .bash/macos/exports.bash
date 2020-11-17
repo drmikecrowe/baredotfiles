@@ -31,3 +31,10 @@ export GPG_TTY=$(tty);
 export BASH_SILENCE_DEPRECATION_WARNING=1;
 
 export PATH="/usr/local/opt/openjdk/bin:$PATH"
+
+# Get list of gnubin directories
+export GNUBINS="$(find /usr/local/opt -type d -follow -name gnubin -print)";
+
+for bindir in ${GNUBINS[@]}; do
+  export PATH=$bindir:$PATH
+done
