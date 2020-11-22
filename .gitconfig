@@ -21,14 +21,16 @@
 
 [include]
     # https://github.com/dandavison/delta
-    path = ~/.g/delta.conf 
+    path = ~/.g/delta.conf
     # My aliases
     path = ~/.g/aliases.conf
     # Use meld as my difftool
     path = ~/.g/meld.conf
 
 [credential]
-	helper = store
+    helper = store
+	# helper = !aws codecommit credential-helper --profile=personal-git-user $@
+	UseHttpPath = true
 
 [branch "master"]
     remote = origin
@@ -42,4 +44,3 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
-  

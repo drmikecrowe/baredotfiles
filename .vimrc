@@ -28,7 +28,7 @@ endif
 source ~/.vim/dotvim.vim
 
 " Override colorscheme from base16
-let g:dotvim_colorscheme = 'github'
+" let g:dotvim_colorscheme = 'github'
 
 " Customize to your needs...
 syntax on
