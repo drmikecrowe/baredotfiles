@@ -1,6 +1,6 @@
 {
     "segments": [
-        "virtual_env",
+        "node_version",
         "aws_profile",
         "ssh",
         "cwd",
