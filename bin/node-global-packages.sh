@@ -25,7 +25,9 @@ COMMON=$(cat <<EOF
     install-peerdeps
     jest
     jscodeshift
+    json2csv
     json-sort-cli
+    maketypes
     mrm
     npm
     npm-check-updates
@@ -33,6 +35,7 @@ COMMON=$(cat <<EOF
     rona
     serverless
     showdown
+    sortjson
     syncpack
     ts-migrate
     ts-node
@@ -65,3 +68,5 @@ case "$OSTYPE" in
     ;;
   *)        echo "unknown: $OSTYPE" ;;
 esac
+
+nodenv rehash
