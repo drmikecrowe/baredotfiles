@@ -5,6 +5,6 @@ export ZOPTS="-I"
 [[ ":$PATH:" != *":/$HOME/bin:"* ]] && export PATH="/$HOME/bin:$PATH"
 [[ ":$PATH:" != *":/$HOME/.local/bin:"* ]] && export PATH="/$HOME/.local/bin:$PATH"
 [[ ":$PATH:" != *":/snap/bin:"* ]] && export PATH="/snap/bin:$PATH"
-[[ ":$PATH:" != *":/home/linuxbrew/.linuxbrew/bin:"* ]] && export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 
+# This removes duplicates from the path
 export PATH=$(echo $PATH | tr ':' '\n' | perl -lne 'chomp; print unless $k{$_}; $k{$_}++' | tr '\n' ':' | sed 's/:$//')
