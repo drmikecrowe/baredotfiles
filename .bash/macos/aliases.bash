@@ -20,3 +20,5 @@ alias la="ls -lAF ${colorflag}"
 alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 
 alias python="python3"
+
+alias typesync="mv ~/.npmrc ~/.npmrc.old && /Users/mcrowe/.nodenv/versions/12.19.0/bin/typesync ; mv ~/.npmrc.old ~/.npmrc"

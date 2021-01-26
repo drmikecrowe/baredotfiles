@@ -16,12 +16,18 @@
 [includeIf "gitdir:~/.yadm/"]
     path = ~/Programming/Personal/.gitconfig
 
+[includeIf "gitdir:~/.cfg/"]
+    path = ~/Programming/Personal/.gitconfig
+
+[includeIf "gitdir:~/Programming/cngholdings"]
+    path = ~/Programming/cngholdings/.gitconfig
+
 [url "git@github.com:"]
     insteadof = github:
 
 [include]
     # https://github.com/dandavison/delta
-    path = ~/.g/delta.conf 
+    path = ~/.g/delta.conf
     # My aliases
     path = ~/.g/aliases.conf
     # Use meld as my difftool
@@ -42,4 +48,6 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
-  
+
+[pull]
+	ff = only
