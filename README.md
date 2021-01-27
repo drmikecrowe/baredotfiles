@@ -1,12 +1,5 @@
 # Installation
 
-## Non-Git Install
-
-```
-wget https://raw.githubusercontent.com/drmikecrowe/baredotfiles/master/.manual-bootstrap.sh
-bash .manual-bootstrap.sh
-```
-
 ## Git Install
 
 ```
