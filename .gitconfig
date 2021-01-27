@@ -45,4 +45,8 @@
     process = git-lfs filter-process
     required = true
 [pull]
-	rebase = false
+    rebase = false
+
+[user]
+	email = drmikecrowe@gmail.com
+	name = Mike Crowe
