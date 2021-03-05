@@ -8,11 +8,11 @@ $PL_PROMPT="cwd>rtns"
 $PL_TOOLBAR = 'who>branch>virtualenv>full_proc'
 
 # XONSH WIZARD START
-xontrib load apt_tabcomplete autojump docker_tabcomplete ssh_agent direnv coreutils powerline2
+xontrib load apt_tabcomplete docker_tabcomplete ssh_agent direnv coreutils powerline2
 # XONSH WIZARD END
 
 $XONSH_STORE_STDOUT = True
-#$XONSH_HISTORY_SIZE = 
+#$XONSH_HISTORY_SIZE =
 $XONSH_HISTORY_MATCH_ANYWHERE = True
 
 if os.path.exists("/usr/bin/ksshaskpass"):

@@ -8,6 +8,8 @@ __enable_alias=(
 __enable_completion=(
   awscli
   bash-it
+  bash-complete-partial-path
+  cod
   docker
   docker-compose
   export
@@ -19,6 +21,7 @@ __enable_completion=(
   makefile
   npm
   pip3
+  pnpm
   rvm
   ssh
   system
