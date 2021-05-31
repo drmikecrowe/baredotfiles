@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-if [ -f ~/.private/.bash_private ]; then 
-  source ~/.private/.bash_private
-fi 
+for f in $HOME/.private/*.sh; do
+    source $f
+done

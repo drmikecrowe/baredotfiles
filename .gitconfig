@@ -4,6 +4,9 @@
 [includeIf "gitdir:~/Programming/Home/"]
     path = ~/Programming/Home/.gitconfig
 
+[includeIf "gitdir:~/Programming/cngholdings/"]
+    path = ~/Programming/cngholdings/.gitconfig
+
 [includeIf "gitdir:~/Programming/MikKelTech/"]
     path = ~/Programming/MikKelTech/.gitconfig
 
@@ -45,8 +48,15 @@
     process = git-lfs filter-process
     required = true
 [pull]
-    rebase = false
+	rebase = false
 
 [user]
-	email = drmikecrowe@gmail.com
-	name = Mike Crowe
+   email = drmikecrowe@gmail.com
+    name = Mike Crowe
+
+[init]
+	defaultBranch = master
+
+[core]
+	editor = /usr/bin/vim
+	autocrlf = input

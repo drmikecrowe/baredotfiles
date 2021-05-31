@@ -58,7 +58,8 @@ HOME=(
 
 case "$OSTYPE" in
   darwin*)
-    yarn add -g "${COMMON[@]} ${WORK[@]}"
+    npm i -g ${COMMON[@]} ${WORK[@]}
+    npm i -g https://github.com/CNGHoldingsInc/mrm-preset-axcess
     ;;
   linux*)
     npm i -g ${COMMON[@]} ${HOME[@]}
