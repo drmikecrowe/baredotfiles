@@ -95,3 +95,7 @@ alias pnpm-global="pnpm install --global --child-concurrency=8"
 alias pnpm-u="pnpm uninstall"
 
 alias repo="npm repo"
+
+if [ -f ~/.npmrc ]; then
+    alias typesync="mv ~/.npmrc /tmp/ && /Users/mcrowe/.nodenv/shims/typesync; mv /tmp/.npmrc ~"
+fi

@@ -11,3 +11,6 @@ export SHORT_USER=${USER:0:8}
 export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
 source "$BASH_IT"/bash_it.sh
 
+for f in $HOME/.bash/custom/*.bash; do
+    source $f
+done

@@ -18,13 +18,13 @@ use_goenv() {
 }
 
 use_nodenv() {
-  export PATH="$HOME/.nodenv/bin:$PATH"
+  [[ ":$PATH:" != *":$HOME/.nodenv/bin:"* ]] && export PATH="$HOME/.nodenv/bin:$PATH"
   eval "$(nodenv init -)"
   [[ ":$PATH:" != *":./node_modules/.bin:"* ]] && export PATH="./node_modules/.bin:$PATH"
 }
 
 use_jenv() {
-  export PATH="$HOME/.jenv/bin:$PATH"
+  export JENV_ROOT=/usr/local/opt/jenv
   eval "$(jenv init -)"
 }
 
@@ -101,3 +101,4 @@ export_function() {
     chmod +x "$target"
   fi
 }
+
