@@ -1,4 +1,4 @@
-[[ -s "$HOME/.profile" ]] && source "$HOME/.profile" # Load the default .profile
+[[ -f "$HOME/.profile" ]] && source "$HOME/.profile" # Load the default .profile
 
 if [ -f ~/.agent.env ] ; then
     . ~/.agent.env > /dev/null
