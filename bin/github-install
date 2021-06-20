@@ -41,8 +41,7 @@ flag|q|quiet|no output
 flag|v|verbose|output more
 flag|f|force|do not ask for confirmation (always yes)
 option|l|log_dir|folder for log files |$HOME/log/$script_prefix
-option|t|tmp_dir|folder for temp files|.tmp
-param|1|action|action to perform: install
+option|t|tmp_dir|folder for temp files|/tmp
 param|?|input|input github-user/project-name
 " | grep -v '^#' | grep -v '^\s*$'
 }
@@ -56,7 +55,7 @@ main() {
 
   action=$(lower_case "$action")
   case $action in
-  install)
+  install|*)
     #TIP: use «$script_prefix install» to ...
     #TIP:> $script_prefix install input.txt
     # shellcheck disable=SC2154
@@ -92,33 +91,59 @@ main() {
 ## Put your helper scripts here
 #####################################################################
 
-do_install() {
-    log_to_file "install [$input]"
+get_extension() {
+    local extensions=( ".tar.gz" ".tgz" ".zip")
+    local base="$(basename $tarfilename)"
+    for e in "${extensions[@]}"; do
+        local f="$(basename $base)"
+        local fext="$(basename $f $e)"
+        if [ "$f" != "$fext" ]; then
+            basename="$fext"
+            extension="$e"
+            break
+        fi
+    done
+    if [ -z $extension ]; then
+        die "Unable to get extension from ${col_red}$base${col_reset}"
+    fi
+    corename="$(echo $basename | sed -E s/-v?[0-9]+\\.[0-9]+\\.[0-9]+.*//g)"
+}
 
-    local loc="${tmp_dir}/$1"
+download() {
+    loc="${tmp_dir}/$1"
     local repo="https://api.github.com/repos/$1/releases/latest"
     local URL=`curl --disable -s "${repo}" | grep "browser_download_url" | cut -d '"' -f 4 | fzf`
     out "Repo: ${col_grn}$repo${col_reset} Temp Dir: ${col_grn}$loc${col_reset}"
-
+    tarfilename="$tmp_dir/$(basename $URL)"
+    rm -rf $loc $tarfilename
+    wget ${URL} -O $tarfilename
     mkdir -p $loc
-    wget ${URL} -O $loc/$(basename $URL)
-    local tarfilename="$(find $loc -name "*.tar.gz")"
-    if [ -z $tarfilename ]; then
-        die "Something went wrong.  Can't find archive"
-    fi
+    set -x
     tar -xzf $tarfilename -C $loc
-    rm $tarfilename
-    local basename="$(basename $tarfilename .tar.gz)"
-    local corename="$(echo $basename | sed -E s/-v?[0-9]+\\.[0-9]+\\.[0-9]+.*//g)"
-    ls $loc -al
+    set +x
+}
+
+do_install() {
+    log_to_file "install [$input]"
+
+    download $1
+    get_extension
+
+    ls -al $loc
 
     local PS3='Please choose the Installing Method: '
-    local gh_options=("Move to Bin Dir" "Make install" "Quit")
+    local gh_options=("Move files to Bin Dir" "Move full directory to Bin Dir" "Make install" "Quit")
     select opt in "${gh_options[@]}"
     do
         case $opt in
-            "Move to Bin Dir")
-                rm -rf $tarfilename
+            "Move files to Bin Dir")
+                for f in $loc/*; do
+                    mv $f $HOME/bin/
+                    out "Installing in ${col_grn}$HOME/bin/$(basename $f)${col_reset} ${char_succ}"
+                done
+                break
+                ;;
+            "Move full directory to Bin Dir")
                 if [ -d $HOME/bin/$basename ]; then
                     out "NOTE: Combining in old folder ${col_grn}$HOME/bin/$basename${col_reset}"
                 fi
@@ -143,7 +168,7 @@ do_install() {
         esac
     done
 
-    rm -rf $loc
+    rm -rf $loc $tarfilename
 }
 
 
