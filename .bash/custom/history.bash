@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+doOnce
 
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 

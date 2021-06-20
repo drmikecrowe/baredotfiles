@@ -2,13 +2,14 @@
 
 # An array with the alias instances to enable
 __enable_alias=(
+  personal
 )
 
 # An array with the completion instances to enable
 __enable_completion=(
   awscli
-  bash-it
   bash-complete-partial-path
+  bash-it
   cod
   docker
   docker-compose
@@ -43,13 +44,17 @@ __enable_plugin=(
   extract
   git
   goenv
+  google-cloud.bash
   history-search
-  log-all-history
+  mcfly
   node
   nodenv
+  personal
+  private
   pyenv
   ssh
   sshagent
+  starship
   tmux
 )
 # Find out where Bash-it is located, with a reasonable fallback
@@ -66,15 +71,27 @@ fi
 source "$__BASH_IT_INSTALL/bash_it.sh"
 echo ''
 
+# Disable all alias instances
+echo 'Disable all alias instances:'
+bash-it disable alias all
+
 # Enable all alias instances in one call
 echo 'Enable alias instances:'
 bash-it enable alias "${__enable_alias[@]}"
 echo ''
 
+# Disable all completion instances
+echo 'Disable all completion instances:'
+bash-it disable completion all
+
 # Enable all completion instances in one call
 echo 'Enable completion instances:'
 bash-it enable completion "${__enable_completion[@]}"
 echo ''
+
+# Disable all plugin instances
+echo 'Disable all plugin instances:'
+bash-it disable plugin all
 
 # Enable all plugin instances in one call
 echo 'Enable plugin instances:'
