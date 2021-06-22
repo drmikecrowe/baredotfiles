@@ -39,7 +39,7 @@ if [ -d $BASH_ID ]; then
     export SHORT_HOSTNAME=$(hostname -s)
     export SHORT_USER=${USER:0:8}
     export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
-    export BASH_IT_LOG_LEVEL=3
+    #export BASH_IT_LOG_LEVEL=3
     source "$BASH_IT"/bash_it.sh
     if [ -f ~/.agent.env ] ; then
         . ~/.agent.env > /dev/null
