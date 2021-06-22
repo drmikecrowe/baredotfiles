@@ -2,11 +2,11 @@ declare -gA loadedScripts
 
 doOnce() {
     if [ ! -v "loadedScripts[${BASH_SOURCE[1]}]" ]; then
-        echo "Loading ${BASH_SOURCE[1]}..."
+        [[ ! -z $VERBOSE ]] && echo "Loading ${BASH_SOURCE[1]}..."
         loadedScripts[${BASH_SOURCE[1]}]=1
         return 1
     else
-        echo "${BASH_SOURCE[1]} already loaded"
+        [[ ! -z $VERBOSE ]] && echo "${BASH_SOURCE[1]} already loaded"
         return 0
     fi
 }
@@ -18,7 +18,7 @@ sourceOnce() {
         loadedScripts[$FILE]=1
         source $FILE
     else
-        echo "$FILE already loaded"
+        [[ ! -z $VERBOSE ]] && echo "$FILE already loaded"
     fi
 }
 

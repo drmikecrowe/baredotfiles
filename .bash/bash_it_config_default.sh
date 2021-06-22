@@ -97,6 +97,6 @@ bash-it enable plugin "${__enable_plugin[@]}"
 echo ''
 
 if [ "$(uname)" != "Darwin" ]; then
-  bash-it disable plugin cod
+  bash-it disable completion cod
   bash-it disable plugin bash-complete-partial-path
 fi
