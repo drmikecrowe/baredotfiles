@@ -8,7 +8,6 @@ __enable_alias=(
 # An array with the completion instances to enable
 __enable_completion=(
   awscli
-  bash-complete-partial-path
   bash-it
   cod
   docker
@@ -44,7 +43,6 @@ __enable_plugin=(
   extract
   git
   goenv
-  google-cloud.bash
   history-search
   mcfly
   node
@@ -97,3 +95,8 @@ bash-it disable plugin all
 echo 'Enable plugin instances:'
 bash-it enable plugin "${__enable_plugin[@]}"
 echo ''
+
+if [ "$(uname)" != "Darwin" ]; then
+  bash-it disable plugin cod
+  bash-it disable plugin bash-complete-partial-path
+fi

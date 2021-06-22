@@ -4,15 +4,28 @@ doOnce() {
     if [ ! -v "loadedScripts[${BASH_SOURCE[1]}]" ]; then
         echo "Loading ${BASH_SOURCE[1]}..."
         loadedScripts[${BASH_SOURCE[1]}]=1
+        return 1
     else
         echo "${BASH_SOURCE[1]} already loaded"
+        return 0
+    fi
+}
+
+sourceOnce() {
+    FILE=$1
+    if [ ! -v "loadedScripts[$FILE]" ]; then
+        [[ ! -z $VERBOSE ]] && echo "Loading $FILE..."
+        loadedScripts[$FILE]=1
+        source $FILE
+    else
+        echo "$FILE already loaded"
     fi
 }
 
 sourceFiles() {
     if [ -d $1 ]; then
         find $1 -maxdepth 1 -type f -print | egrep '\.sh$|\.bash$' | while read FILE; do
-            source $FILE
+            sourceOnce $FILE
         done
     fi
 }

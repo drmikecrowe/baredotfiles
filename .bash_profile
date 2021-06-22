@@ -1,4 +1,4 @@
 source $HOME/.bash/helpers; doOnce
 
-[[ -f "$HOME/.profile" ]] && source "$HOME/.profile" # Load the default .profile
+[[ -f "$HOME/.profile" ]] && sourceOnce "$HOME/.profile" # Load the default .profile
 

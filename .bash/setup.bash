@@ -1,18 +1,26 @@
+source $HOME/.bash/helpers; doOnce && return 0
+
 [[ ":$PATH:" != *":/$HOME/bin:"* ]] && export PATH="/$HOME/bin:$PATH"
 [[ ":$PATH:" != *":/$HOME/.local/bin:"* ]] && export PATH="/$HOME/.local/bin:$PATH"
 [[ ":$PATH:" != *":/snap/bin:"* ]] && export PATH="/snap/bin:$PATH"
 
-[[ ":$PATH:" != *":/$HOME/.nodenv:"* ]] && export PATH="/$HOME/.nodenv:$PATH"
-[[ `which nodenv` ]] && eval "$(nodenv init - bash)"
+if [[ -d /$HOME/.nodenv ]]; then
+    export PATH="/$HOME/.nodenv:$PATH"
+    eval "$(nodenv init - bash)"
+fi
 
-[[ ":$PATH:" != *":/$HOME/.pyenv:"* ]] && export PATH="/$HOME/.pyenv:$PATH"
-[[ `which pyenv` ]] && eval "$(pyenv init - bash)"
+if [[ -d /$HOME/.pyenv ]]; then
+    export PATH="/$HOME/.pyenv:$PATH"
+    eval "$(pyenv init - bash)"
+fi
 
-[[ ":$PATH:" != *":/$HOME/.goenv:"* ]] && export PATH="/$HOME/.goenv:$PATH"
-[[ `which goenv` ]] && eval "$(goenv init - bash)"
+if [[ -d /$HOME/.goenv ]]; then
+    export PATH="/$HOME/.goenv:$PATH"
+    eval "$(goenv init - bash)"
+fi
 
-export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-if [ -d $HOMEBREW_CELLAR ]; then
+if [ -d /home/linuxbrew/.linuxbrew ]; then
+    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
     export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
     export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
     export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin${PATH+:$PATH}"
@@ -31,7 +39,20 @@ if [ -d $BASH_ID ]; then
     export SHORT_HOSTNAME=$(hostname -s)
     export SHORT_USER=${USER:0:8}
     export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
+    export BASH_IT_LOG_LEVEL=3
     source "$BASH_IT"/bash_it.sh
-    ssh-add-all
+    if [ -f ~/.agent.env ] ; then
+        . ~/.agent.env > /dev/null
+        if ! kill -0 $SSH_AGENT_PID > /dev/null 2>&1; then
+            echo "Stale agent file found. Spawning new agent… "
+            eval `ssh-agent | tee ~/.agent.env`
+            ssh-add-all
+        fi
+    else
+        echo "Starting ssh-agent"
+        eval `ssh-agent -s | tee ~/.agent.env`
+        ssh-add-all
+    fi
+
 fi
 
