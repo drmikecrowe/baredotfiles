@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -x
+
+OLD_FILE="$1"
+NEW_FILE="$2"
+
+OLD_DIR=$(dirname $OLD_FILE)
+if [ ! -d $OLD_DIR ]; then
+  make_dir=1
+  mkdir -p $OLD_DIR
+fi
+
+mv $NEW_FILE $OLD_FILE
+git mv $OLD_FILE $NEW_FILE
+if [ "$?" != "0" ]; then
+  mv $OLD_FILE $NEW_FILE
+  git add $NEW_FILE
+fi
+
+if [ "$make_dir" == "1" ]; then
+  rmdir $OLD_DIR
+fi
