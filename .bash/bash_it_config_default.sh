@@ -8,6 +8,7 @@ __enable_alias=(
 # An array with the completion instances to enable
 __enable_completion=(
   awscli
+  bash-complete-partial-path
   bash-it
   cod
   docker
@@ -36,6 +37,7 @@ __enable_plugin=(
   aws
   base
   basher
+  brew
   direnv
   docker
   docker-compose
@@ -43,7 +45,9 @@ __enable_plugin=(
   extract
   git
   goenv
+  google-cloud
   history-search
+  man
   mcfly
   node
   nodenv
@@ -52,7 +56,7 @@ __enable_plugin=(
   pyenv
   ssh
   sshagent
-  starship
+  sudo
   tmux
 )
 # Find out where Bash-it is located, with a reasonable fallback
