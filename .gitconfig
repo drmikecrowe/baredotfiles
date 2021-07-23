@@ -30,10 +30,6 @@
 [pull]
 	rebase = false
 
-[user]
-   email = drmikecrowe@gmail.com
-    name = Mike Crowe
-
 [init]
 	defaultBranch = master
 
@@ -41,8 +37,17 @@
 	editor = /usr/bin/vim
 	autocrlf = input
 
+[includeIf "gitdir:~/.cfg/"]
+    path = ~/Programming/Personal/.gitconfig
+
+[includeIf "gitdir:~/.bash_it/"]
+    path = ~/Programming/Personal/.gitconfig
+
+[includeIf "gitdir:~/.yadm/"]
+    path = ~/Programming/Personal/.gitconfig
+
 [includeIf "gitdir:~/Programming/Personal/"]
-    path = ~/Programming/Programming/.gitconfig
+    path = ~/Programming/Personal/.gitconfig
 
 [includeIf "gitdir:~/Programming/Home/"]
     path = ~/Programming/Home/.gitconfig
@@ -55,9 +60,3 @@
 
 [includeIf "gitdir:~/Programming/Pinnacle/"]
     path = ~/Programming/Pinnacle/.gitconfig
-
-[includeIf "gitdir:~/"]
-    path = ~/Programming/Personal/.gitconfig
-
-[includeIf "gitdir:~/.yadm/"]
-    path = ~/Programming/Personal/.gitconfig
