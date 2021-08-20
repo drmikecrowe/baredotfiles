@@ -92,7 +92,7 @@ main() {
 #####################################################################
 
 get_extension() {
-    local extensions=( ".tar.gz" ".tgz" ".zip")
+    local extensions=( ".tar.gz" ".tgz" ".zip", ".deb")
     local base="$(basename $tarfilename)"
     for e in "${extensions[@]}"; do
         local f="$(basename $base)"
@@ -128,6 +128,12 @@ do_install() {
 
     download $1
     get_extension
+
+    if [ $extension == ".deb" ]; then
+        out "Installing using gdebi"
+        sudo gdebi $tarfilename
+        return
+    fi
 
     ls -al $loc
 

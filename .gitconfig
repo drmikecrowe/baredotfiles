@@ -4,7 +4,7 @@
 
 [include]
     # https://github.com/dandavison/delta
-    path = ~/.g/delta.conf
+    # path = ~/.g/delta.conf
     # My aliases
     path = ~/.g/aliases.conf
     # Use meld as my difftool
