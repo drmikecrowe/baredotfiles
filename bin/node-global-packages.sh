@@ -32,7 +32,6 @@ COMMON=(
     "npm-check-updates"
     "prettier"
     "rona"
-    "serverless"
     "showdown"
     "sortjson"
     "syncpack"
