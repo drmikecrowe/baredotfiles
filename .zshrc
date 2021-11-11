@@ -97,3 +97,34 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+
+cngaws() {
+    unset AWS_PROFILE
+    unset AWS_DEFAULT_PROFILE
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    unset AWS_SESSION_TOKEN
+    unset AWS_ACCOUNT
+
+    export STAGE=${1:-dev}
+    export PROFILE=cng-aws-${STAGE}
+    export AWS_ROLE_ARN="$(awk -F ' *= *' "{ if (\$1 ~ /^\[profile/) section=\$1; else if (section ~ /$PROFILE/ && \$1 ~ /^role_arn/) print \$2}" ~/.aws/config)"
+
+    aws-azure-login --no-prompt
+    JSON=$(aws sts assume-role --role-arn ${AWS_ROLE_ARN} --role-session-name ${USER}@axcess-financial.com --duration-seconds 3600 2>&1)
+
+    if [[ $? -ne 0 ]]; then
+        echo "${JSON}"
+        exit 1
+    fi
+
+        AWS_ACCESS_KEY_ID=$(echo ${JSON} | jq --raw-output ".Credentials[\"AccessKeyId\"]")
+    AWS_SECRET_ACCESS_KEY=$(echo ${JSON} | jq --raw-output ".Credentials[\"SecretAccessKey\"]")
+        AWS_SESSION_TOKEN=$(echo ${JSON} | jq --raw-output ".Credentials[\"SessionToken\"]")
+           AWS_EXPIRATION=$(echo ${JSON} | jq --raw-output ".Credentials[\"Expiration\"]")
+
+    export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+}

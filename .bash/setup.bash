@@ -18,5 +18,6 @@ if [ -d $BASH_IT ]; then
     pathmunge $HOME/bin
     pathmunge $HOME/.local/bin
     [[ -d /snap/bin ]] && pathmunge /snap/bin after
+    [[ -d $HOME/go/bin ]] && pathmunge $HOME/go/bin after
 fi
 
