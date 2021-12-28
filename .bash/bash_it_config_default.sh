@@ -8,9 +8,7 @@ __enable_alias=(
 # An array with the completion instances to enable
 __enable_completion=(
   awscli
-  bash-complete-partial-path
   bash-it
-  cod
   docker
   docker-compose
   export
@@ -38,15 +36,18 @@ __enable_plugin=(
   base
   basher
   brew
+  cod
   direnv
   docker
   docker-compose
   dotbare
   extract
   git
+  github-install
   goenv
   google-cloud
   history-search
+  log-all-history
   man
   mcfly
   node
@@ -100,7 +101,3 @@ echo 'Enable plugin instances:'
 bash-it enable plugin "${__enable_plugin[@]}"
 echo ''
 
-if [ "$(uname)" != "Darwin" ]; then
-  bash-it disable completion cod
-  bash-it disable plugin bash-complete-partial-path
-fi
