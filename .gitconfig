@@ -60,3 +60,9 @@
 
 [includeIf "gitdir:~/Programming/Pinnacle/"]
     path = ~/Programming/Pinnacle/.gitconfig
+[fetch]
+	recurseSubmodules = true
+[diff]
+	submodule = log
+[status]
+	submoduleSummary = true

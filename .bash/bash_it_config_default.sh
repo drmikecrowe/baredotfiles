@@ -35,7 +35,6 @@ __enable_plugin=(
   aws
   base
   basher
-  brew
   cod
   direnv
   docker
