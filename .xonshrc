@@ -8,7 +8,7 @@ $PL_PROMPT="cwd>rtns"
 $PL_TOOLBAR = 'who>branch>virtualenv>full_proc'
 
 # XONSH WIZARD START
-xontrib load apt_tabcomplete docker_tabcomplete ssh_agent direnv coreutils powerline2
+xontrib load apt_tabcomplete docker_tabcomplete ssh_agent direnv coreutils prompt_starship
 # XONSH WIZARD END
 
 $XONSH_STORE_STDOUT = True

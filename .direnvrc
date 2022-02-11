@@ -12,6 +12,7 @@ use_nodenv() {
   [[ ":$PATH:" != *":$HOME/.nodenv/bin:"* ]] && export PATH="$HOME/.nodenv/bin:$PATH"
   eval "$(nodenv init -)"
   [[ ":$PATH:" != *":./node_modules/.bin:"* ]] && export PATH="./node_modules/.bin:$PATH"
+  export NODE_PATH=$(npm root -g)
 }
 
 use_jenv() {

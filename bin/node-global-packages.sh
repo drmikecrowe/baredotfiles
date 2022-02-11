@@ -43,6 +43,7 @@ COMMON=(
     "yarn"
     "yarn-check"
     "yo"
+    "zx"
 )
 
 HOME=(
