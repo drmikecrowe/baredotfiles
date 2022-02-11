@@ -3,6 +3,7 @@
 export BASH_IT="$HOME/.bash_it"
 
 if [ -d $BASH_IT ]; then
+    # export BASH_IT_THEME='powerline-multiline'
     export BASH_IT_THEME='starship'
     unset MAILCHECK
     export IRC_CLIENT='irssi'
