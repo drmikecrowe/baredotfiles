@@ -53,6 +53,7 @@ HOME=(
     "depcheck"
     "firebase-tools"
     "mrm-task-typescript-eslint"
+    "pnpm"
 )
 
 
