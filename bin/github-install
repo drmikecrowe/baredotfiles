@@ -112,7 +112,7 @@ get_extension() {
 download() {
     loc="${tmp_dir}/$1"
     local repo="https://api.github.com/repos/$1/releases/latest"
-    local URL=`curl --disable -s "${repo}" | grep "browser_download_url" | cut -d '"' -f 4 | fzf`
+    local URL=$(curl --disable -s "${repo}" | grep "browser_download_url" | cut -d '"' -f 4 | fzf)
     out "Repo: ${col_grn}$repo${col_reset} Temp Dir: ${col_grn}$loc${col_reset}"
     tarfilename="$tmp_dir/$(basename $URL)"
     rm -rf $loc $tarfilename
