@@ -50,6 +50,9 @@ param|?|input|input github-user/project-name
 ## Put your main script here
 #####################################################################
 
+declare basename
+declare extension
+
 main() {
   log_to_file "[$script_basename] $script_version started"
 
@@ -92,7 +95,7 @@ main() {
 #####################################################################
 
 get_extension() {
-    local extensions=( ".tar.gz" ".tgz" ".zip", ".deb")
+    local extensions=( ".tar.gz" ".tgz" ".zip", ".deb" ".appimage")
     local base="$(basename $tarfilename)"
     for e in "${extensions[@]}"; do
         local f="$(basename $base)"
@@ -117,10 +120,6 @@ download() {
     tarfilename="$tmp_dir/$(basename $URL)"
     rm -rf $loc $tarfilename
     wget ${URL} -O $tarfilename
-    mkdir -p $loc
-    set -x
-    tar -xzf $tarfilename -C $loc
-    set +x
 }
 
 do_install() {
@@ -129,11 +128,31 @@ do_install() {
     download $1
     get_extension
 
-    if [ $extension == ".deb" ]; then
+    case $extension in 
+      .deb)
         out "Installing using gdebi"
         sudo gdebi $tarfilename
+        return 
+        ;;
+      .appimage)
+        mv $tarfilename ~/.local/bin/$basename
+        chmod +x ~/.local/bin/$basename
         return
-    fi
+        ;;
+      .tar.gz|.tgz)
+        out "Decompressing $tarfilename"
+        loc="${tmp_dir}/$1"
+        mkdir -p $loc
+        set -x
+        tar -xzf $tarfilename -C $loc
+        set +x
+        ;;
+      .zip)
+        set -x
+        unzip $tarfilename -d $loc
+        set +x
+        ;;
+    esac  
 
     ls -al $loc
 

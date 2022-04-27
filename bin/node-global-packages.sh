@@ -56,14 +56,18 @@ HOME=(
     "pnpm"
 )
 
+BIN="npm i -g"
+if [[ ! -z $(which volta) ]]; then 
+    BIN="volta install"
+fi
 
 case "$OSTYPE" in
   darwin*)
-    npm i -g ${COMMON[@]} ${WORK[@]}
-    npm i -g https://github.com/CNGHoldingsInc/mrm-preset-axcess
+    $BIN ${COMMON[@]} ${WORK[@]}
+    $BIN https://github.com/CNGHoldingsInc/mrm-preset-axcess
     ;;
   linux*)
-    npm i -g ${COMMON[@]} ${HOME[@]}
+    $BIN ${COMMON[@]} ${HOME[@]}
     ;;
   *)        echo "unknown: $OSTYPE" ;;
 esac

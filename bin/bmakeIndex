@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+testIndex() {
+    C1="$(cat index.ts | sed -E '/^[[:space:]]*$|Auto generated from bmakeIndex/d' | wc -l)"
+    C2="$(cat index.ts | sed -E '/^[[:space:]]*$|Auto generated from bmakeIndex/d' | egrep "^export" | wc -l)"
+    [[ $C1 != $C2 ]]
+}
+
+if [ ! -z $1 ]; then
+    pushd $1 > /dev/null
+fi
+if [ -f index.ts ]; then
+    if $(testIndex); then
+        echo "This looks like more than just an export index.ts, refusing to overwrite"
+    fi
+fi
+echo "// Auto generated from bmakeIndex script" > index.ts
+echo " " >> index.ts
+
+find . -maxdepth 1 -type d | sort | while read DIR; do
+    if [ "$DIR" == "." ]; then continue; fi
+    if [ "$2" == "-r" ]; then
+        bmakeIndex $DIR
+    fi
+    if [ -f $DIR/index.ts ]; then
+        echo "export * from '$DIR'" >> index.ts
+    fi
+done
+echo "Creating index.ts from: " $(find . -maxdepth 1 -type f -name '*.ts' | egrep -v "index|spec" | sort | sed "s/\.ts$/'/")
+find . -maxdepth 1 -type f -name '*.ts' | egrep -v "index|spec" | sort | sed "s/\.ts$/'/" | sed "s/^/export * from '/" >> index.ts
+if [ ! -z $1 ]; then
+    popd > /dev/null
+fi

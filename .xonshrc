@@ -1,35 +1,48 @@
+import sys
 import os
-from datetime import datetime
+from os.path import exists
 from xonsh.platform import ON_LINUX, ON_DARWIN  # ON_DARWIN, ON_WINDOWS, ON_WSL, ON_CYGWIN, ON_MSYS, ON_POSIX, ON_FREEBSD, ON_DRAGONFLY, ON_NETBSD, ON_OPENBSD
 
-# xpip install xonsh-docker-tabcomplete xontrib-ssh-agent xonsh-direnv xontrib-prompt-starship xontrib-readable-traceback
-# xpip install xontrib-termcolors
-# xpip install xonsh-apt-tabcomplete
-# xpip install xontrib-xlsd
-# xpip install xonsh-autoxsh
-# xpip install xontrib-srename
+_xontribs = {
+    "coreutils": None,
+    "autojump": None,
+    "ssh_agent": "xontrib-ssh-agent",
+    "docker_tabcomplete": "xonsh-docker-tabcomplete",
+    "direnv": "xonsh-direnv",
+    "readable-traceback": "xontrib-readable-traceback",
+    "termcolors": "xontrib-termcolors",
+    "autoxsh": "xonsh-autoxsh",
+    "pyenv": "xontrib-langenv",
+    "goenv": "xontrib-langenv",
+    # "nodenv": "xontrib-langenv",
+    # "rbenv": "xontrib-langenv",
+    "log_all_history": "xontrib-log-all-history"
+}
+needed = []
+missing = []
+for k, v in _xontribs.items():
+    needed.append(k)
+    xontrib load @(k)
+for k, v in _xontribs.items():
+    if v and f"xontrib.{k}" not in sys.modules:
+        missing.append(v)
+if missing:
+    print("Please initialize with:")
+    print("xpip install " + " ".join(missing))
 
-_xontribs = [
-    "docker_tabcomplete",
-    "ssh_agent",
-    "direnv",
-    # "prompt_starship",
-    "coreutils",
-    "readable-traceback",
-    "termcolors",
-    "autoxsh",
-    "xlsd",
-    "srename",
-    "pyenv",
-    "nodenv",
-    "goenv",
-    "rbenv"
-]
-if _xontribs:
-    xontrib load @(_xontribs)
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Path adjustments
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-$STARSHIP_SHELL = "xonsh"
 $BINARY_SSH="/usr/bin/ssh"
+
+if exists(f"{$HOME}/.volta"):
+    $VOLTA_HOME=f"{$HOME}/.volta"
+    $PATH.add(f"{$VOLTA_HOME}/bin", front=True, replace=True)
+
+for dir in [f"{$HOME}/bin", f"{$HOME}/.local/bin", "/snap/bin", f"{$HOME}/go/bin"]:
+    if exists(dir):
+        $PATH.add(dir, replace=True)
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # aliases
@@ -82,12 +95,16 @@ if ON_LINUX:
     aliases["agi"] = 'sudo aptitude install'
     aliases["agu"] = 'sudo aptitude update'
     aliases["psa"] = 'ps faux'
-    aliases["psag"] = 'ps faux | grep'
+    aliases["psag"] = lambda args: execx(f'ps faux | egrep -i {repr(args[0])}')
+    aliases["can-ssh"] = "nmap -T4 -F 192.168.0.10-254 -oG - | grep 22/open | sed 's/Ports:.*//'"
+    aliases["vim"] = 'lvim'
+    aliases['mount'] = lambda args: execx(f'mount @(args)') if len(args) else "mount | egrep -v '/dev|snap|/sys|/run'"
+    aliases['flash'] = lambda image: execx(f'sudo dd if={repr(image[0])} of=/dev/mmcblk0 bs=512M status=progress conv=fsync')
 
 try:
-	$EDITOR = ('code -n -w' if $DISPLAY else 'vim')
+	  $EDITOR = ('code -n -w' if $DISPLAY else 'vim')
 except (Exception):
-	$EDITOR = 'vim'
+	  $EDITOR = 'vim'
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Cross platform
@@ -110,42 +127,43 @@ $PUSHD_SILENT = True
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # $XONSH_STORE_STDOUT = True
-$XONSH_HISTORY_BACKEND = 'sqlite'
+
 $XONSH_HISTORY_SIZE = (2**14, 'commands')
 $XONSH_PROC_FREQUENCY = 0.002 # eat less CPU if threading prediction goes awry
 $XONSH_HISTORY_MATCH_ANYWHERE = True
 $HISTCONTROL='ignoredups'
 
-# from xonsh.history.json import JsonHistory
-# class SaveAllHistory(JsonHistory):
-from xonsh.history.sqlite import SqliteHistory
-class SaveAllHistory(SqliteHistory):
-  def append(self, cmd):
-    try:
-      cwd = "{}/.logs{}".format(__xonsh__.env["HOME"], __xonsh__.env["PWD"])
-      if not os.path.exists(cwd): os.makedirs(cwd)
-      file = "{}/xonsh-history-{}.log".format(cwd, datetime.now().strftime("%Y-%m-%d"))
-      open(file, "a").write("{} {}".format(datetime.now().strftime("%Y-%m-%d.%H.%M.%S"), cmd["inp"]))
-      super().append(cmd)
-    except Exception:
-      print("History not being saved")
-$XONSH_HISTORY_BACKEND = SaveAllHistory
-
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Platform specific
+# Starship
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-if ON_DARWIN:
-    pass
+$STARSHIP_CONFIG=$HOME + '/.config/starship.toml'
+# "prompt_starship": "xontrib-prompt-starship",    # "powerline2": "xontrib-powerline2",
 
-if ON_LINUX:
-    aliases["acs"] = 'aptitude search'
-    aliases["agi"] = 'sudo aptitude install'
-    aliases["agu"] = 'sudo aptitude update'
-    aliases["psa"] = 'ps faux'
-    aliases["psag"] = 'ps faux | grep'
+import uuid
 
-    if os.path.exists("/usr/bin/ksshaskpass"):
-        $SSH_ASKPASS = '/usr/bin/ksshaskpass'
+# $STARSHIP_LOG='trace'
 
-    xontrib load apt_tabcomplete
+def starship_prompt():
+    last_cmd = __xonsh__.history[-1] if __xonsh__.history else None
+    status = last_cmd.rtn if last_cmd else 0
+    # I believe this is equivalent to xonsh.jobs.get_next_job_number() for our purposes,
+    # but we can't use that function because of https://gitter.im/xonsh/xonsh?at=60e8832d82dd9050f5e0c96a
+    jobs = sum(1 for job in __xonsh__.all_jobs.values() if job['obj'] and job['obj'].poll() is None)
+    duration = round((last_cmd.ts[1] - last_cmd.ts[0]) * 1000) if last_cmd else 0
+    return $(starship prompt --status=@(status) --jobs=@(jobs) --cmd-duration=@(duration))
+
+def starship_rprompt():
+    last_cmd = __xonsh__.history[-1] if __xonsh__.history else None
+    status = last_cmd.rtn if last_cmd else 0
+    # I believe this is equivalent to xonsh.jobs.get_next_job_number() for our purposes,
+    # but we can't use that function because of https://gitter.im/xonsh/xonsh?at=60e8832d82dd9050f5e0c96a
+    jobs = sum(1 for job in __xonsh__.all_jobs.values() if job['obj'] and job['obj'].poll() is None)
+    duration = round((last_cmd.ts[1] - last_cmd.ts[0]) * 1000) if last_cmd else 0
+    return $(starship prompt --status=@(status) --jobs=@(jobs) --cmd-duration=@(duration) --right)
+
+
+$PROMPT = starship_prompt
+$RIGHT_PROMPT = starship_rprompt
+$STARSHIP_SHELL = "xonsh"
+$STARSHIP_SESSION_KEY = uuid.uuid4().hex
