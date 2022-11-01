@@ -20,9 +20,9 @@ alias ll='ls -la --color=tty'
 alias s='kitty +kitten ssh'
 
 # https://github.com/dyuri/repassh
-alias ssh='~/.local/bin/repassh'
-alias scp='BINARY_SSH=scp ~/.local/bin/repassh'
-alias rsync='BINARY_SSH=rsync ~/.local/bin/repassh'
+
+alias scp='BINARY_SSH=scp /path/to/repassh'
+alias rsync='BINARY_SSH=rsync /path/to/repassh'
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`

@@ -14,6 +14,8 @@ readonly script_author="drmikecrowe@gmail.com"
 readonly script_created="2022-03-19"
 readonly run_as_root=-1 # run_as_root: 0 = don't check anything / 1 = script MUST run as root / -1 = script MAY NOT run as root
 
+export PATH=$PATH:/app/bin
+
 declare LINUX=0
 declare MACOS=0
 declare RPI=0
@@ -51,7 +53,7 @@ flag|v|verbose|output more
 flag|f|force|force update
 flag|a|reask|ask even if installed
 option|l|log_dir|folder for log files |$HOME/log/$script_prefix
-option|t|tmp_dir|folder for temp files|/tmp/bootstrap
+option|t|tmp_dir|folder for temp files|/tmp
 param|1|action|action to perform: all
 param|?|input|input file/text
 " | grep -v '^#' | grep -v '^\s*$'
@@ -116,7 +118,8 @@ do_all() {
         ask_install_obsidian
         ask_install_copyq
         ask_install_default_gui_packages
-        ask_install_google-chrome
+        ask_install_chromium
+        ask_install_google_chrome
         ask_install_opera
         ask_install_peek
         ask_install_terraform
@@ -125,8 +128,11 @@ do_all() {
         ask_install_y_ppa_manager
         ask_install_teams
         ask_install_discord
+        ask_install_telegram
+        ask_install_kitty
     fi
 
+    ask_install_neovim
     ask_install_rclone
     ask_install_htmlq
     ask_install_awscli
@@ -144,26 +150,14 @@ do_all() {
     ask_install_pyenv
     ask_install_tabby
     ask_install_xonsh
-    ask_install_volta
+    ask_install_carapace
 }
 
 ask_install_fonts() {
-    local DEST="$HOME/.local/share/fonts"
-    mkdir -p $DEST
-    find $DEST -name 'Fira*' | grep Fira -q && RC=$? || RC=$?
-    [ "$RC" == "0" ] && [ $reask -eq 0 ] && return
-    if confirm "Install Nerd Fonts?"; then
-        out "Installing ${col_grn}Nerd Fonts${col_reset}"
-        local GITHUB="https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts"
-        for url in JetBrainsMono/Ligatures/Regular/complete/JetBrains%20Mono%20Regular%20Nerd%20Font%20Complete%20Mono.ttf \
-                    FiraCode/Retina/complete/Fira%20Code%20Retina%20Nerd%20Font%20Complete%20Mono.ttf; do
-
-            cd $DEST
-            local BASENAME="$(basename $url)"
-            local FONT_FULL_FILE="${BASENAME//%20/ }"
-            local FONT_FILE="${FONT_FULL_FILE// Nerd Font Complete Mono/}"
-            curl -fLo "$FONT_FILE" $GITHUB/$url
-        done
+    [ -d /usr/share/fonts/opentype/firacode ] && [ $reask -eq 0 ] && return
+    if confirm "Install Fira Code?"; then
+        out "Installing ${col_grn}Fira Code${col_reset}"
+        sudo apt install -y fonts-firacode
         fc-cache -fv
     fi
 }
@@ -210,17 +204,31 @@ ask_install_htmlq() {
 }
 
 ask_install_discord() {
-    [ "$(which discord)" != "" ] && [ $reask -eq 0 ] && return
+    [ -d /var/lib/flatpak/app/com.discordapp.Discord ] && [ $reask -eq 0 ] && return
     if confirm "Install discord?"; then
         out "Installing ${col_grn}discord${col_reset}"
-        sudo snap install discord
-        sudo snap connect discord:system-observe :system-observe
-        sudo snap connect discord:unity7 :unity7
+        sudo flatpak install com.discordapp.Discord
+    fi
+}
+
+ask_install_kitty() {
+    [ -f /home/mcrowe/.local/kitty.app/bin/kitty ] && [ $reask -eq 0 ] && return
+    if confirm "Install kitty?"; then
+        out "Installing ${col_grn}kitty${col_reset}"
+        curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+    fi
+}
+
+ask_install_telegram() {
+    [ -d /var/lib/flatpak/app/org.telegram.desktop  ] && [ $reask -eq 0 ] && return
+    if confirm "Install telegram?"; then
+        out "Installing ${col_grn}telegram${col_reset}"
+        sudo flatpak install org.telegram.desktop
     fi
 }
 
 ask_install_leapp() {
-    [ "$(which leapp)" != "" ] && [ $reask -eq 0 ] && return
+    [ "$(which Leapp.AppImage)" != "" ] && [ $reask -eq 0 ] && return
     if confirm "Install leapp?"; then
         out "Installing ${col_grn}leapp${col_reset}"
         RELEASE="$(wget -qnv -O- https://api.github.com/repos/Noovolari/leapp/releases/latest 2>/dev/null | jq -r '.tag_name')"
@@ -231,8 +239,9 @@ ask_install_leapp() {
         local BASENAME="Leapp"
         curl --location --output /tmp/$BASENAME.AppImage "$dl_url"
         curl --location --output /tmp/$BASENAME.png "$dl_icon"
-
         install_appimage $BASENAME /tmp/$BASENAME.AppImage /tmp/$BASENAME.png
+        curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "/tmp/session-manager-plugin.deb"
+        sudo gdebi -n /tmp/session-manager-plugin.deb
     fi
 }
 
@@ -253,25 +262,32 @@ ask_install_awscli() {
 }
 
 ask_install_copyq() {
-    [ "$(which copyq)" != "" ] && [ $reask -eq 0 ] && return
+    [ -d /var/lib/flatpak/app/com.github.hluk.copyq ] && [ $reask -eq 0 ] && return
     if confirm "Install copyq?"; then
         out "Installing ${col_grn}copyq${col_reset}"
-        sudo add-apt-repository -y  ppa:hluk/copyq
-        sudo apt install -y copyq
+        sudo flatpak install com.github.hluk.copyq
+    fi
+}
+
+ask_install_chromium() {
+    [ -d /var/lib/flatpak/app/org.chromium.Chromium ] && [ $reask -eq 0 ] && return
+    if confirm "Install chromium?"; then
+        out "Installing ${col_grn}chromium${col_reset}"
+        sudo flatpak install org.chromium.Chromium
     fi
 }
 
 ask_install_default_gui_packages() {
-    [ "$(which zulucrypt-gui)" != "" ] && [ $reask -eq 0 ] && return
+    [ "$(which kupfer)" != "" ] && [ $reask -eq 0 ] && return
     if confirm "Install default_gui_packages?"; then
         out "Installing ${col_grn}default_gui_packages${col_reset}"
         install_linux_gui_base
     fi
 }
 
-ask_install_google-chrome() {
+ask_install_google_chrome() {
     [ "$(which google-chrome-beta)" != "" ] && [ $reask -eq 0 ] && return
-    if confirm "Install google-chrome?"; then
+    if confirm "Install chrome?"; then
         out "Installing ${col_grn}google-chrome${col_reset}"
         wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
         sudo rm -f /etc/apt/sources.list.d/google-chrome*
@@ -311,7 +327,7 @@ ask_install_vscode() {
     if confirm "Install vscode?"; then
         out "Installing ${col_grn}vscode${col_reset}"
         local URLBASE="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64";
-        local DEB="${tmp_dir}/latest.deb";        
+        local DEB="${tmp_dir}/latest.deb";
         out "Downloading latest version of ${col_grn}vscode${col_reset} is starting...";
         wget --show-progress -O $DEB $URLBASE;
         printf "Downloading finished.\n\n";
@@ -356,7 +372,7 @@ ask_install_bash_it() {
         out "Installing ${col_grn}bash_it${col_reset}"
         cd "$HOME"
 
-        if [ ! -d ~/.bash_it ]; then
+        if [ -d ~/.bash_it ]; then
             git clone --depth 1 https://github.com/drmikecrowe/bash-it.git .bash_it
         fi
 
@@ -451,10 +467,10 @@ ask_install_fix_sudo() {
 }
 
 ask_install_flameshot() {
-    [ "$(which flameshot)" != "" ] && [ $reask -eq 0 ] && return
+    [ -d /var/lib/flatpak/app/org.flameshot.Flameshot ] && [ $reask -eq 0 ] && return
     if confirm "Install flameshot?"; then
         out "Installing ${col_grn}flameshot${col_reset}"
-        sudo snap install flameshot
+        sudo flatpak install org.flameshot.Flameshot
     fi
 }
 
@@ -489,21 +505,15 @@ ask_install_tabby() {
     [ "$(which tabby)" != "" ] && [ $reask -eq 0 ] && return
     if confirm "Install tabby?"; then
         out "Installing ${col_grn}tabby${col_reset}"
-        LATEST=$(curl --silent "https://api.github.com/repos/Eugeny/tabby/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-        VERSION=${LATEST:1:255}
-        DOWNLOAD="https://github.com/Eugeny/tabby/releases/download/$LATEST/tabby-$VERSION-linux.deb"
-        DEB=$(basename $DOWNLOAD)
-        rm -f /tmp/$DEB*
-        wget -P /tmp $DOWNLOAD
-        sudo gdebi -n /tmp/$DEB
+        github Eugeny/tabby
     fi
 }
 
-ask_install_volta() {
-    [ -d $HOME/.volta ] && [ $reask -eq 0 ] && return
-    if confirm "Install volta?"; then
-        out "Installing ${col_grn}volta${col_reset}"
-        curl https://get.volta.sh | bash
+ask_install_neovim() {
+    [ "$(which nvim)" != "" ] && [ $reask -eq 0 ] && return
+    if confirm "Install neovim?"; then
+        out "Installing ${col_grn}neovim${col_reset}"
+        github neovim/neovim
     fi
 }
 
@@ -518,46 +528,43 @@ ask_install_xonsh() {
     fi
 }
 
+ask_install_carapace() {
+    [ "$(which carapace)" != "" ] && [ $reask -eq 0 ] && return
+    if confirm "Install carapace?"; then
+        out "Installing ${col_grn}carapace${col_reset}"
+        [[ -f /etc/apt/sources.list.d/fury.list ]] || echo 'deb [trusted=yes] https://apt.fury.io/rsteube/ /' | sudo tee /etc/apt/sources.list.d/fury.list
+        sudo apt-get update && sudo apt-get install carapace-bin
+    fi
+}
+
 install_rpi_base() {
     sudo apt update
     sudo apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez direnv gawk jq mc vim-nox
 }
 
 install_linux_base() {
-    sudo apt update
-    sudo apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez \
+    sudo -s apt update
+    sudo -s apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez \
         direnv dselect gawk gdebi git jq mc mysql-client net-tools p7zip-full sshfs tmux tmux-plugin-manager vim-nox virtualenv \
-        htop vpnc-scripts yadm aptitude fonts-powerline libffi-dev augeas-tools tree bat ripgrep fzf silversearcher-ag
-    sudo apt install -y libssl-dev libbz2-dev libreadline-dev libsqlite3-dev
-    if [ "$(which python)" == "" ]; then
-        if [ "$(which python3)" != "" ]; then
-            sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-            sudo update-alternatives --set python /usr/bin/python3
-        fi
-    fi
+        htop vpnc-scripts yadm aptitude fonts-powerline libffi-dev augeas-tools tree bat fzf silversearcher-ag nscd python3-pip \
+        libssl-dev libbz2-dev libreadline-dev libsqlite3-dev unattended-upgrades apt-listchanges bsd-mailx
+    sudo -s dpkg-reconfigure -plow unattended-upgrades
+    sudo -s apt -y auto-remove
 
-    python --version 2>&1 | grep -q 'Python 2'
-    if [ "$?" == "0" ]; then
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 20
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-        sudo update-alternatives --set python /usr/bin/python3
-    fi
-    sudo python -m pip install pip --upgrade
-    sudo apt install unattended-upgrades apt-listchanges bsd-mailx
-    sudo dpkg-reconfigure -plow unattended-upgrades
+    sudo -H /root /home/mcrowe/bin/set-system-python.sh
+    # https://github.com/o2sh/onefetch
+    pushd $HOME/bin > /dev/null
+    curl https://i.jpillora.com/o2sh/onefetch?type=script | bash
+    popd > /dev/null
 }
 
 install_linux_gui_base() {
-    sudo apt install -y gtk2-engines-murrine gtk2-engines-pixbuf fonts-roboto ninja-build meson sassc glogg meld synaptic menulibre kupfer \
-        remmina vim-gtk3 fzulucrypt-gui gnome-tweaks
-    sudo snap install authy
+    sudo apt install -y gtk2-engines-murrine gtk2-engines-pixbuf fonts-roboto ninja-build meson sassc glogg meld synaptic menulibre kupfer remmina vim-gtk3 zulucrypt-gui
+    sudo snap install authy bing-wall
 }
 
 install_base_packages() {
-    local STATUS_FILE=$HOME/.bootstrap.status
-    local current_installed=none
-    [ -f $STATUS_FILE ] && current_installed=$(head -n 1 $STATUS_FILE)
-    if [[ $current_installed != $script_version ]]; then
+    if [[ ! -f /usr/local/bin/pipenv ]]; then
         set +e
         if ((RPI)); then
             install_rpi_base
@@ -567,7 +574,6 @@ install_base_packages() {
             echo "TODO"
         fi
         set -e
-        echo $script_version > $STATUS_FILE
     fi
 }
 
@@ -578,7 +584,7 @@ install_appimage() {
 
     mv $AppImage $HOME/bin/$BASENAME.AppImage
     chmod u+x $HOME/bin/$BASENAME.AppImage
-    if [ ! -d $HOME/.icons ]; then
+    if [ -d $HOME/.icons ]; then
         mkdir $HOME/.icons
     fi
     mv $Icon $HOME/.icons
@@ -596,7 +602,12 @@ Terminal=false" > ~/.local/share/applications/$BASENAME.desktop
 install_appimage_from_url() {
     URL="$1"
     local dl_url="$(wget -qO- $URL | egrep -o 'https.*AppImage' | head -n 1)"
-    local icon_url="$(wget -qO- $URL | egrep -o 'https.*png' | head -n 1)"
+    local icon_url
+    if [[ -z $2 ]]; then
+        icon_url="$(wget -qO- $URL | egrep -o 'https.*png' | head -n 1)"
+    else
+        icon_url="$2"
+    fi
 
     if [[ -z "$dl_url" ]]; then
         echo "missing download link"
@@ -747,7 +758,10 @@ slugify() {
 confirm() {
     # $1 = question
     flag_set $force && return 0
-    read -r -p "$1 [y/N] " -n 1
+    local REPLY=N
+    echo " "
+    echo " "
+    read -r -p "$1 [y/N] " -n 1 REPLY
     echo " "
     [[ $REPLY =~ ^[Yy]$ ]]
 }
@@ -1087,7 +1101,7 @@ folder_prep() {
     if [[ -n "$1" ]]; then
         local folder="$1"
         local max_days=${2:-365}
-        if [[ ! -d "$folder" ]]; then
+        if [[ -d "$folder" ]]; then
             debug "$clean_icon Create folder : [$folder]"
             mkdir -p "$folder"
         else

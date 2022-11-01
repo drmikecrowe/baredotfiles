@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+set -x
+
+VERSION="$1"
+REQS="/tmp/req-$VERSION.txt"
+
+pushd /tmp
+pyenv local $VERSION
+
+if [ ! -f $REQS ]; then 
+  python -m pip freeze > $REQS
+fi
+
+popd 
+
+pyenv uninstall -f $VERSION
+pyenv install $VERSION
+
+pushd /tmp
+python -m pip install -r $REQS
+popd

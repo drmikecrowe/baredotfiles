@@ -3,32 +3,6 @@ import os
 from os.path import exists
 from xonsh.platform import ON_LINUX, ON_DARWIN  # ON_DARWIN, ON_WINDOWS, ON_WSL, ON_CYGWIN, ON_MSYS, ON_POSIX, ON_FREEBSD, ON_DRAGONFLY, ON_NETBSD, ON_OPENBSD
 
-_xontribs = {
-    "coreutils": None,
-    "autojump": None,
-    "ssh_agent": "xontrib-ssh-agent",
-    "docker_tabcomplete": "xonsh-docker-tabcomplete",
-    "direnv": "xonsh-direnv",
-    "readable-traceback": "xontrib-readable-traceback",
-    "termcolors": "xontrib-termcolors",
-    "autoxsh": "xonsh-autoxsh",
-    "pyenv": "xontrib-langenv",
-    "goenv": "xontrib-langenv",
-    # "nodenv": "xontrib-langenv",
-    # "rbenv": "xontrib-langenv",
-    "log_all_history": "xontrib-log-all-history"
-}
-needed = []
-missing = []
-for k, v in _xontribs.items():
-    needed.append(k)
-    xontrib load @(k)
-for k, v in _xontribs.items():
-    if v and f"xontrib.{k}" not in sys.modules:
-        missing.append(v)
-if missing:
-    print("Please initialize with:")
-    print("xpip install " + " ".join(missing))
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Path adjustments
@@ -36,41 +10,93 @@ if missing:
 
 $BINARY_SSH="/usr/bin/ssh"
 
-if exists(f"{$HOME}/.volta"):
-    $VOLTA_HOME=f"{$HOME}/.volta"
-    $PATH.add(f"{$VOLTA_HOME}/bin", front=True, replace=True)
-
-for dir in [f"{$HOME}/bin", f"{$HOME}/.local/bin", "/snap/bin", f"{$HOME}/go/bin"]:
+for dir in [
+    f"{$HOME}/.autojump/bin",
+    f"{$HOME}/bin",
+    f"{$HOME}/.local/bin",
+    "/snap/bin",
+    f"{$HOME}/go/bin"]:
     if exists(dir):
         $PATH.add(dir, replace=True)
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Completions
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+COMPLETIONS_CONFIRM=True
+exec($(carapace _carapace))
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Cross platform
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+$XONSH_SHOW_TRACEBACK = True
+
+$GPG_TTY=$(tty)
+
+# Avoid typing cd just directory path.
+# Docs: https://xonsh.github.io/envvars.html#auto-cd
+$AUTO_CD = True
+$AUTO_PUSHD = True
+
+# Don't clear the screen after quitting a manual page.
+$MANPAGER = "less -X"
+$LESS = "--ignore-case --quit-if-one-screen --quit-on-intr FRXQ"
+
+$PUSHD_SILENT = True
+
+if not $SHLVL:
+    $SHLVL = 0
+$SHLVL = int($SHLVL) + 1
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# functions
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+def _rsyncFolder(args):
+    if len(args) != 2:
+        print("Usage: rsyncFolder (sourceDir) (destDir)")
+        print("ex: rsyncFolder . /tmp/my-test-folder")
+        return
+    mkdir -p @(args[1])
+    /usr/bin/rsync -avrmR --exclude='node_modules/' --exclude='.tmp/' --exclude='.git/' --exclude='.webpack/' --exclude='.serverless/' --exclude='coverage/' --exclude='.history/' @(args[0]) @(args[1])
+
+def _githubInstall(args):
+    if len(args) != 1:
+        print("usage: github-install <user>/<repo>@<release>")
+        return
+    pushd $HOME/bin
+    curl https://i.jpillora.com/@(args[0])?type=script | bash
+    popd
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # aliases
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+aliases['rsyncFolder'] = _rsyncFolder
+aliases['github-install'] = _githubInstall
+
 aliases["....."] = 'cd ../../../..'
 aliases["...."] = 'cd ../../..'
 aliases["..."] = 'cd ../..'
 aliases[".."] = 'cd ..'
+aliases["--"] = 'cd -'
 aliases["cnc"] = 'grep "^[^#;]"'
 aliases["dud"] = 'du -h --max-depth=1 --one-file-system'
 aliases["dudg"] = 'du -h --max-depth=1 --one-file-system 2>&1 | egrep "^[0-9.]*G"'
 aliases["gh"] = 'history | grep --colour=auto'
 aliases["grep"] = "grep --color --exclude-dir='.svn' --exclude-dir='.git'"
 aliases["tail"] = 'tail -n 30'
-aliases["ta"] = 'tmux attach -t'
-aliases["tnew"] = 'tmux new -s'
-aliases["tls"] = 'tmux ls'
-aliases["tkill"] = 'tmux kill-session -t'
 aliases["hc"] = "history show all | grep -v EOF"
-aliases["dotbare"] = "~/.dotbare/dotbare"
+aliases["dotbare"] = f"{$HOME}/.dotbare/dotbare"
 
 # Using rsync instead of cp to get the progress and speed of copying.
 # aliases['cp'] = ['rsync', '--progress', '--recursive', '--archive']
 
 # Make directory and cd into it.
 # Example: md /tmp/my/awesome/dir/will/be/here
-aliases['md'] = lambda args: execx(f'mkdir -p {repr(args[0])} && cd {repr(args[0])}')
+aliases['mkcd'] = lambda args: execx(f'mkdir -p {repr(args[0])} && cd {repr(args[0])}')
 
 # Run http server in the current directory.
 aliases['http-here'] = 'python3 -m http.server'
@@ -91,36 +117,29 @@ if ON_LINUX:
     $LS_COLORS = 'no=00:fi=00:di=01;31:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
     setLsAliases("--color")
 
-    aliases["acs"] = 'aptitude search'
-    aliases["agi"] = 'sudo aptitude install'
-    aliases["agu"] = 'sudo aptitude update'
     aliases["psa"] = 'ps faux'
     aliases["psag"] = lambda args: execx(f'ps faux | egrep -i {repr(args[0])}')
-    aliases["can-ssh"] = "nmap -T4 -F 192.168.0.10-254 -oG - | grep 22/open | sed 's/Ports:.*//'"
-    aliases["vim"] = 'lvim'
+    aliases["ssh-ports-open"] = "nmap -T4 -F 192.168.0.10-254 -oG - | grep 22/open | sed 's/Ports:.*//'"
     aliases['mount'] = lambda args: execx(f'mount @(args)') if len(args) else "mount | egrep -v '/dev|snap|/sys|/run'"
     aliases['flash'] = lambda image: execx(f'sudo dd if={repr(image[0])} of=/dev/mmcblk0 bs=512M status=progress conv=fsync')
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# editor
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+editor = 'vim'
+if $(which lvim 2>/dev/null):
+    editor = 'lvim'
+elif $(which nvim 2>/dev/null):
+    editor = 'nvim'
+
+aliases['vim'] = 'nvim'
 
 try:
 	  $EDITOR = ('code -n -w' if $DISPLAY else 'vim')
 except (Exception):
-	  $EDITOR = 'vim'
+	  $EDITOR = editor
 
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Cross platform
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-$XONSH_SHOW_TRACEBACK = False
-
-# Avoid typing cd just directory path.
-# Docs: https://xonsh.github.io/envvars.html#auto-cd
-$AUTO_CD = True
-
-# Don't clear the screen after quitting a manual page.
-$MANPAGER = "less -X"
-$LESS = "--ignore-case --quit-if-one-screen --quit-on-intr FRXQ"
-
-$PUSHD_SILENT = True
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # History
@@ -134,36 +153,35 @@ $XONSH_HISTORY_MATCH_ANYWHERE = True
 $HISTCONTROL='ignoredups'
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Starship
+# Plugins
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-$STARSHIP_CONFIG=$HOME + '/.config/starship.toml'
-# "prompt_starship": "xontrib-prompt-starship",    # "powerline2": "xontrib-powerline2",
-
-import uuid
-
-# $STARSHIP_LOG='trace'
-
-def starship_prompt():
-    last_cmd = __xonsh__.history[-1] if __xonsh__.history else None
-    status = last_cmd.rtn if last_cmd else 0
-    # I believe this is equivalent to xonsh.jobs.get_next_job_number() for our purposes,
-    # but we can't use that function because of https://gitter.im/xonsh/xonsh?at=60e8832d82dd9050f5e0c96a
-    jobs = sum(1 for job in __xonsh__.all_jobs.values() if job['obj'] and job['obj'].poll() is None)
-    duration = round((last_cmd.ts[1] - last_cmd.ts[0]) * 1000) if last_cmd else 0
-    return $(starship prompt --status=@(status) --jobs=@(jobs) --cmd-duration=@(duration))
-
-def starship_rprompt():
-    last_cmd = __xonsh__.history[-1] if __xonsh__.history else None
-    status = last_cmd.rtn if last_cmd else 0
-    # I believe this is equivalent to xonsh.jobs.get_next_job_number() for our purposes,
-    # but we can't use that function because of https://gitter.im/xonsh/xonsh?at=60e8832d82dd9050f5e0c96a
-    jobs = sum(1 for job in __xonsh__.all_jobs.values() if job['obj'] and job['obj'].poll() is None)
-    duration = round((last_cmd.ts[1] - last_cmd.ts[0]) * 1000) if last_cmd else 0
-    return $(starship prompt --status=@(status) --jobs=@(jobs) --cmd-duration=@(duration) --right)
-
-
-$PROMPT = starship_prompt
-$RIGHT_PROMPT = starship_rprompt
-$STARSHIP_SHELL = "xonsh"
-$STARSHIP_SESSION_KEY = uuid.uuid4().hex
+_xontribs = {
+    "coreutils": None,
+    "autojump": None,
+    "ssh_agent": "xontrib-ssh-agent",
+    "direnv": "xonsh-direnv",
+    "readable-traceback": "xontrib-readable-traceback",
+    "termcolors": "xontrib-termcolors",
+    "autoxsh": "xonsh-autoxsh",
+    # "pyenv": "xontrib-langenv",
+    # "goenv": "xontrib-langenv",
+    # "nodenv": "xontrib-langenv",
+    # "rbenv": "xontrib-langenv",
+    "log_all_history": "xontrib-log-all-history",
+    "prompt_starship": "xontrib-prompt-starship",
+    "xlsd": "xontrib-xlsd",
+    "cd": "xontrib-cd",
+    "gitinfo": "xontrib-gitinfo"
+}
+needed = []
+missing = []
+for k, v in _xontribs.items():
+    needed.append(k)
+    xontrib load @(k)
+for k, v in _xontribs.items():
+    if v and f"xontrib.{k}" not in sys.modules:
+        missing.append(v)
+if missing:
+    print("Please initialize with:")
+    print("xpip install " + " ".join(missing))

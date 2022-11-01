@@ -34,7 +34,6 @@
 	defaultBranch = master
 
 [core]
-	editor = /usr/bin/vim
 	autocrlf = input
 
 [includeIf "gitdir:~/.cfg/"]
