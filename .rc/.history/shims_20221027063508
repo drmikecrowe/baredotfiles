@@ -1,0 +1,16 @@
+_command_exists() {
+    type "$1" &> /dev/null
+}
+
+set -x
+if [[ -z $_shims_sourced ]]; then
+
+    DIR="$HOME/.dotbare"
+    if [[ -d "$DIR" ]]; then
+        [[ ! _command_exists dotbare ]] && source $DIR/dotbare.plugin.zsh
+    fi
+
+fi
+set +x
+
+export _shims_sourced=1

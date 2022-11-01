@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+psa() {
+	ps $psParams
+}
+
+psag() {
+	psa | grep -v grep | grep $@
+}
+
+mkcd() {
+    [ -n "$1" ] && mkdir -p "$@" && cd "$1";
+}
+
+rustscan() {
+    /snap/bin/rustscan -g $@
+}
+
+rsyncNode() {
+    mkdir -p "$2"
+    rsync -avrmR --exclude='node_modules/' --exclude='.tmp/' --exclude='.git/' --exclude='.webpack/' --exclude='.serverless/' --exclude='coverage/' $@
+}
+
+rsyncFolder() {
+    mkdir -p "$2"
+    rsync -avrmR --exclude='node_modules/' $@
+}
+
+sourceFiles() {
+    if [ -d $1 ]; then
+        find $1 -maxdepth 1 -type f -print | egrep '\.sh$|\.bash$|.zsh$' | while read FILE; do
+            source $FILE
+        done
+    fi
+}
+
+github-install() {
+	if [ "$1" == "" ]; then
+		echo "usage: github-install <user>/<repo>@<release>"
+		return
+	fi
+
+	pushd $HOME/bin > /dev/null
+
+	curl https://i.jpillora.com/$1?type=script | bash
+
+	popd > /dev/null
+}

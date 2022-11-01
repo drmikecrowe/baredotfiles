@@ -1,0 +1,21 @@
+
+SHELL=$(basename $(echo $0))
+
+[[ -d ""$HOME/.dotbare"" ]] && ! _command_exists dotbare && source "$HOME/.dotbare"/dotbare.plugin.$SHELL
+
+_command_exists direnv && eval "$(direnv hook $SHELL)"
+
+
+
+
+
+
+
+if [[ -n "$PYENV_ROOT" && -x "$PYENV_ROOT/bin/pyenv" ]] || [[ -x "$HOME/.pyenv/bin/pyenv" ]]; then
+    if ! _command_exists pyenv; then
+        export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+        _path_prepend "$PYENV_ROOT/bin"
+        eval "$(pyenv init -)"
+    fi
+fi
+

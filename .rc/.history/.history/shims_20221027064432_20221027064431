@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+_command_exists() {
+    type "$1" &> /dev/null
+}
+
+if [[ -z $_shims_sourced ]]; then
+
+    DIR="$HOME/.dotbare"
+    [[ -d "$DIR" ]] &&  ! _command_exists dotbare && source $DIR/dotbare.plugin.zsh
+
+    [[ _command_exists direnv ]] && eval "$(direnv hook bash)"
+
+    if [[ -d $HOME?]
+
+fi
+
+export _shims_sourced=1

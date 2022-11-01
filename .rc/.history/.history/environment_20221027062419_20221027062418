@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+export GPG_TTY=$(tty)
+export PIPENV_VENV_IN_PROJECT=1
+
+if [ -z $(which lvim) ]; then
+    export EDITOR=vim
+else
+    export EDITOR=lvim
+fi
+
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*) export psParams="faux" ;;
+    Darwin*) export psParams="aux" ;;
+esac
+

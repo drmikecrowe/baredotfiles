@@ -1,0 +1,11 @@
+if [[ -z $_shims_sourced ]]; then
+
+
+    DIR="$HOME/.dotbare"
+    if [[ -d "$DIR" ]]; then
+        [[ ":$PATH:" != *":/$DIR:"* ]] && source $DIR/dotbare.plugin.zsh
+    fi
+
+fi
+
+export _shims_sourced=1

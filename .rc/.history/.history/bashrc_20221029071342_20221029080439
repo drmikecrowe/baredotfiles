@@ -1,0 +1,9 @@
+source $HOME/.rc/environment
+source $HOME/.rc/functions
+source $HOME/.rc/aliases
+source $HOME/.rc/paths
+source $HOME/.rc/bash-options
+source $HOME/.rc/shims
+
+source $HOME/.rc/start-bashit
+

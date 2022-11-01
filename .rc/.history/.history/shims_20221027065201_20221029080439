@@ -1,0 +1,68 @@
+_command_exists() {
+    type "$1" &> /dev/null
+}
+
+SHELL=$(echo $0)
+
+
+if [[ -z $_shims_sourced ]]; then
+
+    DIR="$HOME/.dotbare"
+    [[ -d "$DIR" ]] &&  ! _command_exists dotbare && source $DIR/dotbare.plugin.zsh
+
+    [[ _command_exists direnv ]] && eval "$(direnv hook bash)"
+
+    if _command_exists goenv || [[ -n "$GOENV_ROOT" && -x "$GOENV_ROOT/bin/goenv" ]] || [[ -x "$HOME/.goenv/bin/goenv" ]]; then
+        true
+    else
+        # Set GOENV_ROOT, if not already set
+        export GOENV_ROOT="${GOENV_ROOT:-$HOME/.goenv}"
+
+        # Add GOENV_ROOT/bin to PATH, if that's where it's installed
+        ! _command_exists goenv && [[ -x "$GOENV_ROOT/bin/goenv" ]] && _path_prepend "$GOENV_ROOT/bin"
+
+        # Initialize goenv
+        eval "$(goenv init - bash)"
+    fi
+
+    if _command_exists jenv || [[ -n "$JENV_ROOT" && -x "$JENV_ROOT/bin/jenv" ]] || [[ -x "$HOME/.jenv/bin/jenv" ]]; then
+        true
+    else
+        # Set JENV_ROOT, if not already set
+        export JENV_ROOT="${JENV_ROOT:-$HOME/.jenv}"
+
+        # Add JENV_ROOT/bin to PATH, if that's where it's installed
+        ! _command_exists jenv && [[ -x "$JENV_ROOT/bin/jenv" ]] && _path_prepend "$JENV_ROOT/bin"
+
+        # Initialize jenv
+        eval "$(jenv init - bash)"
+    fi
+
+    if [[ -d $HOME/.nodenv ]]; then
+        export NODENV_ROOT="$HOME/.nodenv"
+        _path_prepend "$NODENV_ROOT/bin"
+        eval "$(nodenv init - bash)"
+    fi
+
+    if _command_exists pyenv || [[ -n "$PYENV_ROOT" && -x "$PYENV_ROOT/bin/pyenv" ]] || [[ -x "$HOME/.pyenv/bin/pyenv" ]]; then
+        true
+    else
+        # Set PYENV_ROOT, if not already set
+        export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+
+        # Add PYENV_ROOT/bin to PATH, if that's where it's installed
+        ! _command_exists pyenv && [[ -x "$PYENV_ROOT/bin/pyenv" ]] && _path_prepend "$PYENV_ROOT/bin"
+
+        # Initialize pyenv
+        eval "$(pyenv init - bash)"
+
+        # Load pyenv virtualenv if the virtualenv plugin is installed.
+        if pyenv virtualenv-init - &> /dev/null; then
+            eval "$(pyenv virtualenv-init - bash)"
+        fi
+    fi
+
+
+fi
+
+export _shims_sourced=1

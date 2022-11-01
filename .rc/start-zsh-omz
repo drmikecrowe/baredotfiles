@@ -1,0 +1,22 @@
+export PATH=$HOME/bin:/usr/local/bin:$PATH:$HOME/.local
+
+export EDITOR=lvim
+
+eval "$(nodenv init -)"
+
+zstyle ':omz:update' mode auto # just remind me to update when it's time
+zstyle ':omz:update' frequency 13
+ENABLE_CORRECTION="true"
+
+export ZSH="$HOME/.oh-my-zsh"
+export ZSH_CUSTOM="$HOME/.zsh-personal"
+export HISTORY_BASE="$HOME/.logs"
+export HISTORY_START_WITH_GLOBAL=true
+export ZSH_THEME=""
+
+# THEME="kphoen"
+THEME="starship"
+
+plugins=(git ag aliases autojump aws colored-man-pages docker docker-compose ssh-agent pip rsync personal per-directory-history direnv)
+
+source $ZSH/oh-my-zsh.sh
