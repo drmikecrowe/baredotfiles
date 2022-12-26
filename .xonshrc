@@ -20,6 +20,12 @@ for dir in [
         $PATH.add(dir, replace=True)
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# environment
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+$SSH_AUTH_SOCK = "/home/mcrowe/.1password/agent.sock"
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Completions
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +91,7 @@ aliases["--"] = 'cd -'
 aliases["cnc"] = 'grep "^[^#;]"'
 aliases["dud"] = 'du -h --max-depth=1 --one-file-system'
 aliases["dudg"] = 'du -h --max-depth=1 --one-file-system 2>&1 | egrep "^[0-9.]*G"'
-aliases["gh"] = 'history | grep --colour=auto'
+aliases["hg"] = 'history | grep --colour=auto'
 aliases["grep"] = "grep --color --exclude-dir='.svn' --exclude-dir='.git'"
 aliases["tail"] = 'tail -n 30'
 aliases["hc"] = "history show all | grep -v EOF"
@@ -133,7 +139,7 @@ if $(which lvim 2>/dev/null):
 elif $(which nvim 2>/dev/null):
     editor = 'nvim'
 
-aliases['vim'] = 'nvim'
+aliases['vim'] = editor
 
 try:
 	  $EDITOR = ('code -n -w' if $DISPLAY else 'vim')
@@ -153,26 +159,42 @@ $XONSH_HISTORY_MATCH_ANYWHERE = True
 $HISTCONTROL='ignoredups'
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# prompt
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+$PL_COLORS = {
+        "cwd": ("BLACK", "#a6e22e"),
+        "git_root": ("BLUE", ""),
+        "git_sub_dir": ("BLACK",""),
+        "branch": ("WHITE")}
+$PL_PROMPT='user>virtualenv>cwd>branch>time'
+$PL_TOOLBAR='!'
+$PL_RPROMPT='!'
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Plugins
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 _xontribs = {
     "coreutils": None,
+    # "fish_completer": None,
     "autojump": None,
-    "ssh_agent": "xontrib-ssh-agent",
     "direnv": "xonsh-direnv",
     "readable-traceback": "xontrib-readable-traceback",
     "termcolors": "xontrib-termcolors",
     "autoxsh": "xonsh-autoxsh",
-    # "pyenv": "xontrib-langenv",
-    # "goenv": "xontrib-langenv",
-    # "nodenv": "xontrib-langenv",
-    # "rbenv": "xontrib-langenv",
     "log_all_history": "xontrib-log-all-history",
-    "prompt_starship": "xontrib-prompt-starship",
     "xlsd": "xontrib-xlsd",
     "cd": "xontrib-cd",
-    "gitinfo": "xontrib-gitinfo"
+    "gitinfo": "xontrib-gitinfo",
+    "term_integration": "xontrib-term-integrations",
+    "powerline2": "xontrib-powerline2",
+    "ssh_agent": "xontrib-ssh-agent",
+    # "pyenv": "xontrib-langenv",
+    # "goenv": "xontrib-langenv",
+    "nodenv": "xontrib-langenv",
+    # "rbenv": "xontrib-langenv",
+    # "prompt_starship": "xontrib-prompt-starship",
 }
 needed = []
 missing = []
@@ -185,3 +207,4 @@ for k, v in _xontribs.items():
 if missing:
     print("Please initialize with:")
     print("xpip install " + " ".join(missing))
+

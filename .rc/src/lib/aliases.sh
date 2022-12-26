@@ -11,18 +11,13 @@ alias cnc='grep "^[^#;]"'
 alias cpuu="ps -e -o pcpu,cpu,nice,state,cputime,args --sort pcpu | sed '/^ 0.0 /d'"
 alias dud='du -h --max-depth=1 --one-file-system'
 alias dudg='du -h --max-depth=1 --one-file-system 2>&1 | egrep "^[0-9.]*G"'
-alias gh='history | grep --colour=auto'
+alias hg='history | grep --colour=auto'
 alias grep="grep --color --exclude-dir='.svn' --exclude-dir='.git'"
 alias hc="history | cut -b 8-"
 alias l.='ls -d .[a-zA-Z]* --color=tty'
 alias l='ls -l --color=tty'
 alias ll='ls -la --color=tty'
 alias s='kitty +kitten ssh'
-
-# https://github.com/dyuri/repassh
-alias ssh='~/.local/bin/repassh'
-alias scp='BINARY_SSH=scp ~/.local/bin/repassh'
-alias rsync='BINARY_SSH=rsync ~/.local/bin/repassh'
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
@@ -76,5 +71,7 @@ alias psa='ps aux | cut -b -180'
 alias psag='ps aux | cut -b -180 | grep'
 
 alias ssh-ports-open="nmap -T4 -F 192.168.0.10-254 --min-parallelism=20 -oG - | grep 22/open"
+
+alias pbcopy="xclip -selection clipboard"
 
 [[ ! -z $_RC_DEBUG ]] && echo "Initialized aliases.sh"

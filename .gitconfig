@@ -42,6 +42,9 @@
 [includeIf "gitdir:~/.bash_it/"]
     path = ~/Programming/Personal/.gitconfig
 
+[includeIf "gitdir:~/.zprezto/"]
+    path = ~/Programming/Personal/.gitconfig
+
 [includeIf "gitdir:~/.yadm/"]
     path = ~/Programming/Personal/.gitconfig
 

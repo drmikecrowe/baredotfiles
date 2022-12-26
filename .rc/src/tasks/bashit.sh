@@ -19,6 +19,4 @@ export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
 
 source "$BASH_IT"/bash_it.sh
 
-[[ -d $HOME/.ssh ]] && [[ $(find $HOME/.ssh | egrep 'id_.*pub' | wc -l) -gt 0 ]] && [[ $(ssh-add -L | wc -l) == 0 ]] && ssh-add-all
-
 # vi:et:ts=4:sw=4

@@ -344,4 +344,4 @@ HELP
   fi
   return $status
 }
-cli_ohmyzsh
+cli_bash
