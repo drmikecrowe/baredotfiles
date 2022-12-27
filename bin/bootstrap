@@ -112,7 +112,7 @@ do_all() {
     # require_binary "progressbar" "basher install pforret/progressbar"
     # (code)
 
-    if [ -n "$DISPLAY" ]; then
+    if [[ -n ${DISPLAY:-} ]]; then
         ask_install_fonts
         ask_install_leapp
         ask_install_obsidian
@@ -199,7 +199,7 @@ ask_install_htmlq() {
     [ "$(which htmlq)" != "" ] && [ $reask -eq 0 ] && return
     if confirm "Install htmlq?"; then
         out "Installing ${col_grn}htmlq${col_reset}"
-        github-install mgdm/htmlq
+        github mgdm/htmlq
     fi
 }
 
@@ -512,8 +512,19 @@ ask_install_tabby() {
 ask_install_neovim() {
     [ "$(which nvim)" != "" ] && [ $reask -eq 0 ] && return
     if confirm "Install neovim?"; then
+        CONFIG=$HOME/.config/nvim
+        NVIM_PLUG=$HOME/.local/share/nvim/site
         out "Installing ${col_grn}neovim${col_reset}"
         github neovim/neovim
+    fi 
+    if [[ ! -d $NVIM_PLUG/pack/packer ]]; then 
+        mkdir -p $NVIM_PLUG/pack/packer/start
+        if [[ ! -d $NVIM_PLUG/pack/packer ]]; then 
+            git clone --depth 1 https://github.com/wbthomason/packer.nvim $NVIM_PLUG/pack/packer/start/packer.nvim
+        fi
+        mkdir -p $CONFIG
+        # TODO: replace with mine
+        wget -O- https://raw.githubusercontent.com/nvim-lua/kickstart.nvim/master/init.lua > $CONFIG/init.lua
     fi
 }
 
@@ -543,18 +554,39 @@ install_rpi_base() {
 }
 
 install_linux_base() {
-    sudo -s apt update
-    sudo -s apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez \
-        direnv dselect gawk gdebi git jq mc mysql-client net-tools p7zip-full sshfs tmux tmux-plugin-manager vim-nox virtualenv \
-        htop vpnc-scripts yadm aptitude fonts-powerline libffi-dev augeas-tools tree bat fzf silversearcher-ag nscd python3-pip \
-        libssl-dev libbz2-dev libreadline-dev libsqlite3-dev unattended-upgrades apt-listchanges bsd-mailx
-    sudo -s dpkg-reconfigure -plow unattended-upgrades
-    sudo -s apt -y auto-remove
+    set +e
+    systemctl list-timers apt-daily.timer | grep -q '1 timers listed'
+    if [[ $? == 1 ]] || ((force)); then 
+        sudo -s apt update
+        sudo -s apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez \
+            direnv dselect gawk gdebi git jq mc mysql-client net-tools p7zip-full sshfs tmux tmux-plugin-manager vim-nox virtualenv \
+            htop vpnc-scripts yadm aptitude fonts-powerline libffi-dev augeas-tools tree bat fzf silversearcher-ag nscd python3-pip \
+            libssl-dev libbz2-dev libreadline-dev libsqlite3-dev unattended-upgrades apt-listchanges bsd-mailx ripgrep fd
+        sudo -s apt -y auto-remove
+        sudo -s dpkg-reconfigure -plow unattended-upgrades 
+    fi
+    set -e
 
-    sudo -H /root /home/mcrowe/bin/set-system-python.sh
-    # https://github.com/o2sh/onefetch
+    [[ ! -d $HOME/bin ]] && mkdir -p $HOME/bin
+    if [[ ! -d $HOME/.local/bin ]]; then 
+	mkdir -p $HOME/.local/bin
+	cat <<EOF >> $HOME/.bashrc
+
+export PATH=$PATH:$HOME/.local/bin:$HOME/bin
+EOF
+    fi
+    if [[ -f $HOME/bin/set-system-python.sh ]]; then 
+        sudo -H /root /home/mcrowe/bin/set-system-python.sh
+    fi
     pushd $HOME/bin > /dev/null
-    curl https://i.jpillora.com/o2sh/onefetch?type=script | bash
+    if [[ ! -f $HOME/bin/github ]]; then 
+        wget -q https://raw.githubusercontent.com/drmikecrowe/baredotfiles/master/bin/github
+	chmod +x github
+    fi
+    if [[ ! -f $HOME/bin/onefetch ]]; then 
+	# https://github.com/o2sh/onefetch
+	curl https://i.jpillora.com/o2sh/onefetch?type=script | bash
+    fi
     popd > /dev/null
 }
 
@@ -1101,7 +1133,7 @@ folder_prep() {
     if [[ -n "$1" ]]; then
         local folder="$1"
         local max_days=${2:-365}
-        if [[ -d "$folder" ]]; then
+        if [[ ! -d "$folder" ]]; then
             debug "$clean_icon Create folder : [$folder]"
             mkdir -p "$folder"
         else
@@ -1274,4 +1306,4 @@ else
     trap - INT TERM EXIT
 fi
 
-# vim: set expandtab:ts=4:sw=4
+# vim: tabstop=4 shiftwidth=4 expandtab
