@@ -1,0 +1,77 @@
+{
+    "ExportConstFun": {
+        "body": [
+            "export const $1 = ($2): $3 => {",
+            "    $4",
+            "};"
+        ],
+        "description": "Export constant function",
+        "prefix": "ecf",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Main w/Yargs": {
+        "prefix": "yargs",
+        "body": [
+            "import yargs from 'yargs'",
+            "",
+            "interface Arguments extends yargs.Argv {",
+            "  v: boolean",
+            "  verbose: boolean",
+            "}",
+            "",
+            "const yarg_config: any = {",
+            "  v: {",
+            "    alias: 'verbose',",
+            "    type: 'boolean',",
+            "    description: 'Run with verbose logging'",
+            "  },",
+            "}",
+            "",
+            "if (require.main === module) {",
+            "  let argv: Arguments",
+            "  const main = async () => {",
+            "    argv = yargs(process.argv.slice(2)).options(yarg_config).help().argv as any",
+            "    // ",
+            "  }",
+            "",
+            "  const _e = (err: Error) => {",
+            "    console.error('ERROR running main: ', err)",
+            "    process.exit(1)",
+            "  }",
+            "",
+            "  const _d = (data?: any) => {",
+            "    if (data && argv.verbose) console.log(data)",
+            "    process.exit(0)",
+            "  }",
+            "  process.on('uncaughtException', _e)",
+            "  process.on('unhandledRejection', _e)",
+            "  main().then(_d).catch(_e)",
+            "}"
+        ],
+        "description": "Main w/Yargs"
+    },
+    "Main with error": {
+        "prefix": "main",
+        "body": [
+            "if (require.main === module) {",
+            "  const main = async () => {",
+            "    // TODO",
+            "  }",
+            "",
+            "  const _e = (err: Error) => {",
+            "    console.error(err)",
+            "    process.exit(1)",
+            "  }",
+            "  ",
+            "  const _d = (data?: any) => {",
+            "    if (data) console.log(data)",
+            "    process.exit(0)",
+            "  }",
+            "  process.on('uncaughtException', _e)",
+            "  process.on('unhandledRejection', _e)",
+            "  main().then(_d).catch(_e)",
+            "}"
+        ],
+        "description": "Main with error"
+    }
+}

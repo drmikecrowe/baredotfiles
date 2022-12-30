@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../nvim"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../../.local/share/lunarvim"
+		}
+	]
+}

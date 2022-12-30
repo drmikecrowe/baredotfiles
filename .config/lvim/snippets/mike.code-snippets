@@ -1,0 +1,437 @@
+{
+    "Markdown Details": {
+        "prefix": "detail",
+        "body": [
+            "<details><summary>$0</summary>",
+            "",
+            "</details>"
+        ],
+        "description": "Markdown Details",
+        "scope": "markdown"
+    },
+    "Warning Markdown box": {
+        "prefix": "warn",
+        "body": [
+            "> :warning: "
+        ],
+        "description": "Warning Markdown box",
+        "scope": "markdown"
+    },
+    "Info Markdown box": {
+        "prefix": "info",
+        "body": [
+            "> :information_source: "
+        ],
+        "description": "Information Markdown box",
+        "scope": "markdown"
+    },
+    "Exclamation Markdown box": {
+        "prefix": "exclamation",
+        "body": [
+            "> :ballot_box_with_check: "
+        ],
+        "description": "Exclamation Markdown box",
+        "scope": "markdown"
+    },
+    "X Markdown box": {
+        "prefix": "xbox",
+        "body": [
+            "> :x: "
+        ],
+        "description": "X Markdown box",
+        "scope": "markdown"
+    },
+    "Create a yargs parameter": {
+        "prefix": "yarp",
+        "body": [
+            "$1: {",
+            "  alias: \"$2\",",
+            "  type: \"string\",",
+            "  description: \"$3\",",
+            "},"
+        ],
+        "description": "Create a yargs parameter"
+    },
+    "Add pnpm preinstall": {
+        "body": [
+            "\"preinstall\": \"node -e \\\"if (process.env.npm_execpath.indexOf('pnpm') === -1) { console.log('\\u001b[31mPlease use pnpm for installing\\u001b[0m'); process.exit(1); }\\\"\","
+        ],
+        "description": "Add pnpm preinstall",
+        "prefix": "preinstall",
+        "scope": "javascript"
+    },
+    "Entries": {
+        "prefix": "oe",
+        "body": [
+            "Object.entries($1).forEach(([key, value]) => {",
+            "  $2",
+            "})"
+        ],
+        "description": "Entries",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "EditorConfig": {
+        "body": [
+            "# EditorConfig helps developers define and maintain consistent",
+            "# coding styles between different editors and IDEs",
+            "# http://editorconfig.org",
+            "",
+            "root = true",
+            "",
+            "[*.js]",
+            "indent_style = space",
+            "indent_size = 2",
+            "end_of_line = lf",
+            "charset = utf-8",
+            "trim_trailing_whitespace = true",
+            "insert_final_newline = true",
+            "",
+            "[*.md]",
+            "trim_trailing_whitespace = false",
+            "",
+            "[*.py]",
+            "indent_size = 4",
+            "",
+            "[*.yml]",
+            "indent_size = 4",
+            "indent_style = space",
+            ""
+        ],
+        "description": "EditorConfig",
+        "prefix": "editorconfig"
+    },
+    "ExportConstFun": {
+        "body": [
+            "export const $1 = ($2): $3 => {",
+            "    $4",
+            "};"
+        ],
+        "description": "Export constant function",
+        "prefix": "ecf",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Main w/Yargs": {
+        "prefix": "yargs",
+        "body": [
+            "import yargs from 'yargs'",
+            "",
+            "interface Arguments extends yargs.Argv {",
+            "  v: boolean",
+            "  verbose: boolean",
+            "}",
+            "",
+            "const yarg_config: any = {",
+            "  v: {",
+            "    alias: 'verbose',",
+            "    type: 'boolean',",
+            "    description: 'Run with verbose logging'",
+            "  },",
+            "}",
+            "",
+            "if (require.main === module) {",
+            "  let argv: Arguments",
+            "  const main = async () => {",
+            "    argv = yargs(process.argv.slice(2)).options(yarg_config).help().argv as any",
+            "    // ",
+            "  }",
+            "",
+            "  const _e = (err: Error) => {",
+            "    console.error('ERROR running main: ', err)",
+            "    process.exit(1)",
+            "  }",
+            "",
+            "  const _d = (data?: any) => {",
+            "    if (data && argv.verbose) console.log(data)",
+            "    process.exit(0)",
+            "  }",
+            "  process.on('uncaughtException', _e)",
+            "  process.on('unhandledRejection', _e)",
+            "  main().then(_d).catch(_e)",
+            "}"
+        ],
+        "description": "Main w/Yargs"
+    },
+    "Main with error": {
+        "prefix": "main",
+        "body": [
+            "if (require.main === module) {",
+            "  const main = async () => {",
+            "    // TODO",
+            "  }",
+            "",
+            "  const _e = (err: Error) => {",
+            "    console.error(err)",
+            "    process.exit(1)",
+            "  }",
+            "  ",
+            "  const _d = (data?: any) => {",
+            "    if (data) console.log(data)",
+            "    process.exit(0)",
+            "  }",
+            "  process.on('uncaughtException', _e)",
+            "  process.on('unhandledRejection', _e)",
+            "  main().then(_d).catch(_e)",
+            "}"
+        ],
+        "description": "Main with error"
+    },
+    "New Promise with Async Body": {
+        "body": [
+            "new Promise((resolve, reject) => (async () => {",
+            "    $0",
+            "});"
+        ],
+        "description": "New Promise with Async Body",
+        "prefix": "aprom",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Wait": {
+        "body": [
+            "const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))",
+            "",
+            "$0"
+        ],
+        "description": "Wait for a few ms",
+        "prefix": "wait",
+        "scope": "javascript,typescript"
+    },
+    "Immediate": {
+        "body": [
+            "const setImmediatePromise = () => new Promise((resolve) => setImmediate(resolve))",
+            "",
+            "$0"
+        ],
+        "description": "Use setImmediate to yield the event loop",
+        "prefix": "immediate",
+        "scope": "javascript,typescript"
+    },
+    "Singleton": {
+        "body": [
+            "class $1 {",
+            "    private static instance: $1;",
+            "    private constructor() {",
+            "        // do something construct...",
+            "    }",
+            "    static getInstance() {",
+            "        if (!$1.instance) {",
+            "            $1.instance = new $1();",
+            "            // ... any one time initialization goes here ...",
+            "        }",
+            "        return $1.instance;",
+            "    }",
+            "    //someMethod() { }",
+            "}"
+        ],
+        "description": "Create a typescript,typescriptreact singleton",
+        "prefix": "singleton",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Try Block": {
+        "body": [
+            "try {",
+            "    $1",
+            "} catch (err) {",
+            "    console.log(err);",
+            "}"
+        ],
+        "description": "Make a try/catch block",
+        "prefix": "try",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "aco": {
+        "body": [
+            "(async (${1}) => {",
+            "    $0",
+            "})(${1}).catch((err) => {",
+            "    console.error(err)",
+            "});"
+        ],
+        "description": "Async coroutine",
+        "prefix": "aco",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "afn": {
+        "body": [
+            "const $1 = async ($2) => {",
+            "    $0",
+            "};"
+        ],
+        "description": "Async Constant Function",
+        "prefix": "afn",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "cfn": {
+        "body": [
+            "const $1 = ($2) => {",
+            "    $0",
+            "};"
+        ],
+        "description": "Constant Function",
+        "prefix": "cfn",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "format": {
+        "body": [
+            "//@formatter:on"
+        ],
+        "description": "Restart IntelliJ auto-formatting code",
+        "prefix": "format",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "ita": {
+        "body": [
+            "it('$1', async () => {",
+            "  $2",
+            "}); "
+        ],
+        "description": "Inserts it() block (async)",
+        "prefix": "ita",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "itp": {
+        "body": [
+            "it.todo('$1');",
+            "// it('$1', async function() {",
+            "//   ",
+            "// });",
+            "",
+            "$2"
+        ],
+        "description": "Inserts pending it block",
+        "prefix": "itp",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "noformat": {
+        "body": [
+            "//@formatter:off"
+        ],
+        "description": "Disable IntelliJ auto-formatting beyond this line (use when you have single-line code to not be reformatted)",
+        "prefix": "noformat",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "prom": {
+        "body": [
+            "return new Promise((resolve, reject) => (async () => {",
+            "    $0",
+            "});"
+        ],
+        "description": "Return a promise",
+        "prefix": "prom",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Create debug log": {
+        "prefix": "rdebug",
+        "body": [
+            "import debug from \"debug\";",
+            "const log = debug('$1:$TM_FILENAME_BASE');",
+            ""
+        ],
+        "description": "Create debug log",
+        "scope": "javascript,typescript,typescriptreact"
+    },
+    "Axios Class": {
+        "prefix": "axios-class",
+        "body": [
+            "import { getLogger, wrapWithAxiosLogger } from 'axf-logging'",
+            "import * as redact from 'axf-logging/dist/lib/redact'",
+            "import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'",
+            "import axiosRetry from 'axios-retry'",
+            "",
+            "const env = '$1'",
+            "",
+            "const API_KEY = '$4'",
+            "const API_URL = `https://serverless.${'${env}'}.cngaws.com/$2`",
+            "",
+            "const log = getLogger()",
+            "",
+            "const logAxiosError = (error: AxiosError) => {",
+            "  const config = error.config",
+            "  const { url, method } = config",
+            "  const message = `Error on outbound call -- ${'${method}'}: ${'${redact.http.url(url)}'}`",
+            "  log.error(message, error)",
+            "}",
+            "",
+            "abstract class HttpClient {",
+            "  protected readonly instance: AxiosInstance",
+            "",
+            "  public constructor(baseURL: string, axiosRetries = 1) {",
+            "    axiosRetry(axios, {",
+            "      retries: axiosRetries,",
+            "      shouldResetTimeout: true,",
+            "      retryCondition: (_error: AxiosError) => {",
+            "        logAxiosError(_error)",
+            "        return true",
+            "      },",
+            "    })",
+            "    this.instance = axios.create({",
+            "      baseURL,",
+            "    })",
+            "",
+            "    this._initializeResponseInterceptor()",
+            "  }",
+            "",
+            "  protected request = (config: AxiosRequestConfig): Promise<any> => wrapWithAxiosLogger(this.instance.request(config))()",
+            "  protected get = (url: string, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.get(url, config))()",
+            "  protected delete = (url: string, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.delete(url, config))()",
+            "  protected head = (url: string, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.head(url, config))()",
+            "  protected options = (url: string, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.options(url, config))()",
+            "  protected post = (url: string, data?: any, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.post(url, data, config))()",
+            "  protected put = (url: string, data?: any, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.put(url, data, config))()",
+            "  protected patch = (url: string, data?: any, config?: AxiosRequestConfig): Promise<any> =>",
+            "    wrapWithAxiosLogger(this.instance.patch(url, data, config))()",
+            "",
+            "  protected _handleError = (error: any) => Promise.reject(error)",
+            "",
+            "  private _initializeResponseInterceptor = () => {",
+            "    this.instance.interceptors.response.use(this._handleResponse, this._handleError)",
+            "  }",
+            "",
+            "  private _handleResponse = ({ data }: AxiosResponse) => data",
+            "}",
+            "",
+            "export class $3Protected<T> extends HttpClient {",
+            "  public constructor() {",
+            "    super(API_URL) // The API URL",
+            "",
+            "    this._initializeRequestInterceptor()",
+            "  }",
+            "",
+            "  // public get$3 = (): Promise<T[]> => this.get('/TODO')",
+            "  // public get$3 = (id: string): Promise<T> => this.get(`/TODO/${'${id}'}`)",
+            "",
+            "  private _initializeRequestInterceptor = () => {",
+            "    this.instance.interceptors.request.use(this._handleRequest, this._handleError)",
+            "  }",
+            "",
+            "  private _handleRequest = (config: AxiosRequestConfig) => {",
+            "    config.headers['x-api-key'] = API_KEY",
+            "",
+            "    return config",
+            "  }",
+            "}",
+            ""
+        ],
+        "description": "Axios Class"
+    },
+    "Describe Each Table": {
+        "prefix": "desctab",
+        "body": [
+            "  describe('$0', () => {",
+            "    it.each`",
+            "      header1  | header2",
+            "      ${'one'} | ${'two'}",
+            "    `('should ...', async ({ header1, header2 }) => {",
+            "      expect(header1)",
+            "    })",
+            "  })"
+        ],
+        "description": "Describe Each Table",
+        "scope": "typescript"
+    }
+}
