@@ -52,7 +52,7 @@ lvim.keys.normal_mode["-"] = ":split<CR>"
 -- lvim.builtin.theme.options.style = "storm"
 
 -- Use which-key to add extra bindings with the leader-key prefix
-lvim.builtin.which_key.mappings["?"] = { '<cmd>Cheatsheet<cr>', "Exit Neovim" }
+lvim.builtin.which_key.mappings["?"] = { '<cmd>Cheatsheet<cr>', "Show Cheatsheat" }
 lvim.builtin.which_key.mappings["Q"] = { "<cmd>qall<CR>", "Exit Neovim" }
 lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
 lvim.builtin.which_key.mappings["t"] = {
@@ -236,12 +236,69 @@ linters.setup {
 -- Additional Plugins
 lvim.plugins = {
   {
+    "tpope/vim-fugitive",
+    cmd = {
+      "G",
+      "Git",
+      "Gdiffsplit",
+      "Gread",
+      "Gwrite",
+      "Ggrep",
+      "GMove",
+      "GDelete",
+      "GBrowse",
+      "GRemove",
+      "GRename",
+      "Glgrep",
+      "Gedit"
+    },
+    ft = { "fugitive" }
+  },
+  {
+    "ray-x/lsp_signature.nvim",
+    event = "BufRead",
+    config = function() require "lsp_signature".on_attach() end,
+  },
+  {
+    "tpope/vim-surround",
+    -- make sure to change the value of `timeoutlen` if it's not triggering correctly, see https://github.com/tpope/vim-surround/issues/117
+    -- setup = function()
+    --  vim.o.timeoutlen = 500
+    -- end
+  },
+  {
+    'abecodes/tabout.nvim',
+    config = function()
+      require('tabout').setup {
+        tabkey = '<Tab>', -- key to trigger tabout, set to an empty string to disable
+        backwards_tabkey = '<S-Tab>', -- key to trigger backwards tabout, set to an empty string to disable
+        act_as_tab = true, -- shift content if tab out is not possible
+        act_as_shift_tab = false, -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
+        default_tab = '<C-t>', -- shift default action (only at the beginning of a line, otherwise <TAB> is used)
+        default_shift_tab = '<C-d>', -- reverse shift default action,
+        enable_backwards = true, -- well ...
+        completion = true, -- if the tabkey is used in a completion pum
+        tabouts = {
+          { open = "'", close = "'" },
+          { open = '"', close = '"' },
+          { open = '`', close = '`' },
+          { open = '(', close = ')' },
+          { open = '[', close = ']' },
+          { open = '{', close = '}' }
+        },
+        ignore_beginning = true, --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
+        exclude = {} -- tabout will ignore these filetypes
+      }
+    end,
+    wants = { 'nvim-treesitter' }, -- or require if not used so far
+    after = { 'nvim-cmp' } -- if a completion plugin is using tabs load it before
+  },
+  {
     "folke/trouble.nvim",
     cmd = "TroubleToggle",
   },
   {
     'sudormrfbin/cheatsheet.nvim',
-
     requires = {
       { 'nvim-telescope/telescope.nvim' },
       { 'nvim-lua/popup.nvim' },
@@ -252,21 +309,11 @@ lvim.plugins = {
     'Pocco81/auto-save.nvim',
     config = function()
       require("auto-save").setup {
-        -- trigger_events = { "InsertLeave", "TextChanged" },
+        -- trigger_events = { "TextChanged", "FocusLost" },
         -- write_all_buffers = true,
         -- debounce_delay = 135,
       }
     end,
-  },
-  {
-    'natecraddock/workspaces.nvim',
-    config = function()
-      require('workspaces').setup({
-        hooks = {
-          open = { 'Telescope find_files' },
-        }
-      })
-    end
   },
   {
     "lukas-reineke/lsp-format.nvim"
