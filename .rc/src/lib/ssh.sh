@@ -3,7 +3,7 @@
 # alias scp='BINARY_SSH=scp $HOME/.local/bin/repassh'
 # alias rsync='BINARY_SSH=rsync $HOME/.local/bin/repassh'
 
-if [[ -f $HOME/.1password/agent.sock ]]; then
+if [[ -d $HOME/.1password ]]; then
   export SSH_AUTH_SOCK=$HOME/.1password/agent.sock
 else
   eval `ssh-agent`

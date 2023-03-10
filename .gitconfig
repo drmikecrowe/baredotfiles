@@ -36,6 +36,9 @@
 [core]
 	autocrlf = input
 
+[includeIf "gitdir:~/.config/lvim/"]
+    path = ~/Programming/Personal/.gitconfig
+
 [includeIf "gitdir:~/.config/nvim/"]
     path = ~/Programming/Personal/.gitconfig
 

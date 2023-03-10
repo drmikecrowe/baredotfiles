@@ -7,3 +7,4 @@ else
     export EDITOR=lvim
 fi
 [[ ! -z $_RC_DEBUG ]] && echo "Initialized environment.sh"
+    

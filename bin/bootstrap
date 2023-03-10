@@ -516,10 +516,10 @@ ask_install_neovim() {
         NVIM_PLUG=$HOME/.local/share/nvim/site
         out "Installing ${col_grn}neovim${col_reset}"
         github neovim/neovim
-    fi 
-    if [[ ! -d $NVIM_PLUG/pack/packer ]]; then 
+    fi
+    if [[ ! -d $NVIM_PLUG/pack/packer ]]; then
         mkdir -p $NVIM_PLUG/pack/packer/start
-        if [[ ! -d $NVIM_PLUG/pack/packer ]]; then 
+        if [[ ! -d $NVIM_PLUG/pack/packer ]]; then
             git clone --depth 1 https://github.com/wbthomason/packer.nvim $NVIM_PLUG/pack/packer/start/packer.nvim
         fi
         mkdir -p $CONFIG
@@ -556,34 +556,34 @@ install_rpi_base() {
 install_linux_base() {
     set +e
     systemctl list-timers apt-daily.timer | grep -q '1 timers listed'
-    if [[ $? == 1 ]] || ((force)); then 
+    if [[ $? == 1 ]] || ((force)); then
         sudo -s apt update
         sudo -s apt install -y apt-transport-https curl autojump bash-completion build-essential ca-certificates cifs-utils comprez \
             direnv dselect gawk gdebi git jq mc mysql-client net-tools p7zip-full sshfs tmux tmux-plugin-manager vim-nox virtualenv \
             htop vpnc-scripts yadm aptitude fonts-powerline libffi-dev augeas-tools tree bat fzf silversearcher-ag nscd python3-pip \
             libssl-dev libbz2-dev libreadline-dev libsqlite3-dev unattended-upgrades apt-listchanges bsd-mailx ripgrep fd
         sudo -s apt -y auto-remove
-        sudo -s dpkg-reconfigure -plow unattended-upgrades 
+        sudo -s dpkg-reconfigure -plow unattended-upgrades
     fi
     set -e
 
     [[ ! -d $HOME/bin ]] && mkdir -p $HOME/bin
-    if [[ ! -d $HOME/.local/bin ]]; then 
+    if [[ ! -d $HOME/.local/bin ]]; then
 	mkdir -p $HOME/.local/bin
 	cat <<EOF >> $HOME/.bashrc
 
 export PATH=$PATH:$HOME/.local/bin:$HOME/bin
 EOF
     fi
-    if [[ -f $HOME/bin/set-system-python.sh ]]; then 
+    if [[ -f $HOME/bin/set-system-python.sh ]]; then
         sudo -H /root /home/mcrowe/bin/set-system-python.sh
     fi
     pushd $HOME/bin > /dev/null
-    if [[ ! -f $HOME/bin/github ]]; then 
+    if [[ ! -f $HOME/bin/github ]]; then
         wget -q https://raw.githubusercontent.com/drmikecrowe/baredotfiles/master/bin/github
 	chmod +x github
     fi
-    if [[ ! -f $HOME/bin/onefetch ]]; then 
+    if [[ ! -f $HOME/bin/onefetch ]]; then
 	# https://github.com/o2sh/onefetch
 	curl https://i.jpillora.com/o2sh/onefetch?type=script | bash
     fi

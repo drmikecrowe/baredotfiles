@@ -9,8 +9,10 @@ from xonsh.platform import ON_LINUX, ON_DARWIN  # ON_DARWIN, ON_WINDOWS, ON_WSL,
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 $BINARY_SSH="/usr/bin/ssh"
+$DENO_INSTALL="/home/mcrowe/.deno"
 
 for dir in [
+    f"{$DENO_INSTALL}/bin",
     f"{$HOME}/.autojump/bin",
     f"{$HOME}/bin",
     f"{$HOME}/.local/bin",
@@ -125,8 +127,7 @@ if ON_LINUX:
 
     aliases["psa"] = 'ps faux'
     aliases["psag"] = lambda args: execx(f'ps faux | egrep -i {repr(args[0])}')
-    aliases["ssh-ports-open"] = "nmap -T4 -F 192.168.0.10-254 -oG - | grep 22/open | sed 's/Ports:.*//'"
-    aliases['mount'] = lambda args: execx(f'mount @(args)') if len(args) else "mount | egrep -v '/dev|snap|/sys|/run'"
+    aliases["ssh-open-ports"] = "nmap -T4 -F 192.168.0.3-254 -oG - | grep 22/open | sed 's/Ports:.*//'"
     aliases['flash'] = lambda image: execx(f'sudo dd if={repr(image[0])} of=/dev/mmcblk0 bs=512M status=progress conv=fsync')
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -167,7 +168,8 @@ $PL_COLORS = {
         "git_root": ("BLUE", ""),
         "git_sub_dir": ("BLACK",""),
         "branch": ("WHITE")}
-$PL_PROMPT='user>virtualenv>cwd>branch>time'
+$PL_PROMPT='cwd>virtualenv>branch\nuser>time'
+$PL_EXTRA_SEC = {}
 $PL_TOOLBAR='!'
 $PL_RPROMPT='!'
 
@@ -181,6 +183,7 @@ _xontribs = {
     "autojump": None,
     "direnv": "xonsh-direnv",
     "readable-traceback": "xontrib-readable-traceback",
+    "fish_completer": "xontrib-fish_completer",
     "termcolors": "xontrib-termcolors",
     "autoxsh": "xonsh-autoxsh",
     "log_all_history": "xontrib-log-all-history",
