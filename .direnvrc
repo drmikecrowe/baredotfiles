@@ -36,6 +36,8 @@ layout_poetry() {
   poetry run true
 
   export VIRTUAL_ENV=$(poetry env info --path)
-  export POETRY_ACTIVE=1
-  PATH_add "$VIRTUAL_ENV/bin"
+  if [[ -d $VIRTUAL_ENV ]]; then
+    export POETRY_ACTIVE=1
+    PATH_add "$VIRTUAL_ENV/bin"
+  fi
 }

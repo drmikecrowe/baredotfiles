@@ -1,3 +1,71 @@
+
+install_appimage() {
+    local BASENAME="$1"
+    local AppImage="$2"
+    local Icon="$3"
+
+    mv $AppImage $HOME/bin/$BASENAME.AppImage
+    chmod u+x $HOME/bin/$BASENAME.AppImage
+    mkdir -p $HOME/.icons
+    mv $Icon $HOME/.icons
+
+    echo "[Desktop Entry]
+Type=Application
+Name=$BASENAME
+Exec=$HOME/bin/$BASENAME.AppImage
+Icon=$BASENAME
+Terminal=false" > ~/.local/share/applications/$BASENAME.desktop
+
+    update-desktop-database ~/.local/share/applications
+}
+
+install_appimage_from_url() {
+    URL="$1"
+    local dl_url="$(wget -qO- $URL | egrep -o 'https.*AppImage' | head -n 1)"
+    local icon_url
+    if [[ -z $2 ]]; then
+        icon_url="$(wget -qO- $URL | egrep -o 'https.*png' | head -n 1)"
+    else
+        icon_url="$2"
+    fi
+
+    if [[ -z "$dl_url" ]]; then
+        echo "missing download link"
+        exit 1
+    fi
+
+    local BASENAME="$(basename $dl_url .AppImage | sed -e 's/[-0-9.]*$//')"
+
+    curl --location --output ${tmp_dir}/$BASENAME.AppImage "$dl_url"
+    curl --location --output ${tmp_dir}/$BASENAME.png "$icon_url"
+    install_appimage $BASENAME ${tmp_dir}/$BASENAME.AppImage ${tmp_dir}/$BASENAME.png
+}
+
+install_github_release() {
+    set +e
+    OUT=$(mktemp)
+    wget -qnv -O- https://api.github.com/repos/$1/releases/latest 2>/dev/null >$OUT
+    URL="$(jq -r '.assets[] | select(.browser_download_url | contains("amd64.deb")) | .browser_download_url' $OUT)"
+    if [ "$URL" != "" ]; then
+        set -e
+        wget $URL -O $OUT.deb
+        sudo gdebi -n $OUT.deb
+    else
+        URL="$(jq -r '.assets[] | select(.browser_download_url | match("linux.*x86_64";"i")) | .browser_download_url' $OUT)"
+        if [ "$URL" != "" ]; then
+            set -e
+            BASE="$(basename $URL)"
+            BIN="$(echo $BASE | sed 's/_.*//')"
+            wget -qnv $URL -O $OUT
+            mv $OUT ~/.local/bin/$BIN
+            chmod +x ~/.local/bin/$BIN
+        fi
+    fi
+    rm -f $OUT*
+    set -e
+}
+
+
 #####################################################################
 ################### DO NOT MODIFY BELOW THIS LINE ###################
 #####################################################################

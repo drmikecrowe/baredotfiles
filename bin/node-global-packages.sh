@@ -54,17 +54,14 @@ HOME=(
     "firebase-tools"
     "mrm-task-typescript-eslint"
     "pnpm"
+    "meta"
 )
 
 BIN="npm i -g"
-if [[ ! -z $(which volta) ]]; then 
-    BIN="volta install"
-fi
 
 case "$OSTYPE" in
   darwin*)
     $BIN ${COMMON[@]} ${WORK[@]}
-    $BIN https://github.com/CNGHoldingsInc/mrm-preset-axcess
     ;;
   linux*)
     $BIN ${COMMON[@]} ${HOME[@]}
