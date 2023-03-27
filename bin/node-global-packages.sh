@@ -31,6 +31,7 @@ COMMON=(
     "npm"
     "npm-check-updates"
     "prettier"
+    "quicktype"
     "rona"
     "showdown"
     "sortjson"

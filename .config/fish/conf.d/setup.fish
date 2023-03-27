@@ -1,9 +1,5 @@
 # Load private config
 # (local settings or computer specific config for example)
-if [ -f $HOME/.config/fish/private.fish ]
-    source $HOME/.config/fish/private.fish
-end
-
 # Colors for ls command
 set -gx LSCOLORS "Cxbgdxdxbxdgeghegeacad"
 
@@ -24,5 +20,9 @@ case FreeBSD NetBSD DragonFly
     set -x OSTYPE "FreeBSD"
 case '*'
     set -x OSTYPE "unknown"
+end
+
+if [ -f $HOME/.config/fish/private.fish ]
+    source $HOME/.config/fish/private.fish
 end
 
