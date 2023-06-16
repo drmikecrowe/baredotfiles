@@ -64,7 +64,7 @@ case "$OSTYPE" in
   darwin*)
     $BIN ${COMMON[@]} ${WORK[@]}
     ;;
-  linux*)
+  Linux*)
     $BIN ${COMMON[@]} ${HOME[@]}
     ;;
   *)        echo "unknown: $OSTYPE" ;;
