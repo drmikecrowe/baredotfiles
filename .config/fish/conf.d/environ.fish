@@ -1,4 +1,4 @@
-for i in ~/bin /usr/local/bin ~/.local/bin /snap/bin ~/go/bin 
+for i in ~/.nix-profile/bin /bin /usr/local/bin ~/.local/bin /snap/bin ~/go/bin
     if [ -d $i ]
         if not contains $i $PATH
             set PATH $PATH $i
@@ -24,7 +24,7 @@ if [ -d ~/.pyenv ]
         set -Ux PYENV_ROOT $HOME/.pyenv
         set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
     end
-    pyenv init - | source    
+    pyenv init - | source
 end
 
 if [ -d ~/.goenv ]

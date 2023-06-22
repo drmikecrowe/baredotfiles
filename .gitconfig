@@ -4,11 +4,11 @@
 
 [include]
     # https://github.com/dandavison/delta
-    # path = ~/.g/delta.conf
+    # path = ~/.config/git/delta.conf
     # My aliases
-    path = ~/.g/aliases.conf
+    path = ~/.config/git/aliases.conf
     # Use meld as my difftool
-    path = ~/.g/meld.conf
+    path = ~/.config/git/meld.conf
 
 [credential]
     helper = store
@@ -60,6 +60,9 @@
 [includeIf "gitdir:~/Programming/Personal/"]
     path = ~/Programming/Personal/.gitconfig
 
+[includeIf "gitdir:~/Programming/nix-os/"]
+    path = ~/Programming/nix-os/.gitconfig
+
 [includeIf "gitdir:~/Programming/Home/"]
     path = ~/Programming/Home/.gitconfig
 
@@ -71,6 +74,7 @@
 
 [includeIf "gitdir:~/Programming/Pinnacle/"]
     path = ~/Programming/Pinnacle/.gitconfig
+
 [fetch]
 	recurseSubmodules = true
 [diff]
